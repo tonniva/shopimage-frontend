@@ -7,38 +7,40 @@ import Script from "next/script";
 
 // ✅ SEO Metadata
 export const metadata = {
-  title: "Convert to WebP | ลดขนาดรูปภาพออนไลน์ฟรี แปลงภาพ WebP/JPG/PNG",
+  title: "ย่อรูปสินค้า Shopee Lazada | Convert to WebP ฟรี คมชัด ไม่แตก",
   description:
-    "เว็บแปลงรูปออนไลน์ฟรี Convert to WebP | ลดขนาดรูปภาพ คมชัด คุณภาพสูง รองรับ Shopee, Lazada, Facebook, LINE OA, Instagram ไม่มีลายน้ำ ใช้งานฟรี!",
+    "ย่อรูปสินค้า Shopee Lazada ออนไลน์ฟรี รองรับ WebP / JPG / PNG ลดขนาดรูปแต่ยังคมชัด ไม่ลดคุณภาพ เหมาะสำหรับพ่อค้าแม่ค้าออนไลน์ ปรับขนาดตามแพลตฟอร์มอัตโนมัติ ใช้งานฟรี 100%",
   keywords: [
-    "convert to webp",
-    "webp converter",
-    "แปลงรูป webp",
+    "ย่อรูป",
+    "ย่อรูปออนไลน์",
     "ลดขนาดรูป",
-    "บีบอัดรูป",
+    "แปลงรูป webp",
+    "convert to webp",
     "compress image",
-    "image compressor",
-    "แปลงรูปออนไลน์",
-    "แปลงไฟล์ JPG เป็น WebP",
-    "บีบอัดรูปภาพออนไลน์",
-    "แปลงรูป Shopee",
-    "แปลงรูป Lazada",
+    "เว็บย่อรูป",
+    "บีบอัดรูปภาพ",
+    "ย่อรูป shopee",
+    "ขนาดรูป shopee",
+    "ย่อรูป lazada",
+    "แปลงรูป lazada",
     "ขายของออนไลน์",
-    "แปลงรูป WebP คุณภาพดี"
+    "ทำร้านค้าออนไลน์",
+    "เว็บลดขนาดรูป",
+    "เปลี่ยน JPG เป็น WebP"
   ],
-  authors: [{ name: "To WebP" }],
+  authors: [{ name: "ย่อรูป.com" }],
   openGraph: {
-    title: "Convert to WebP | ลดขนาดรูปออนไลน์ฟรี",
+    title: "ย่อรูปสินค้า Shopee Lazada | แปลง WebP ฟรี คมชัด ไม่แตก",
     description:
-      "เครื่องมือแปลงรูป WebP / JPEG / PNG ออนไลน์ ความละเอียดสูง ใช้งานง่าย เหมาะสำหรับพ่อค้าแม่ค้าออนไลน์",
+      "เว็บย่อรูปแนะนำสำหรับ Shopee Lazada ขายของออนไลน์ ลดขนาดภาพ โหลดไว ประหยัดเน็ต ไม่มีลายน้ำ ใช้งานฟรี!",
     url: "https://ย่อรูป.com",
-    siteName: "To WebP",
+    siteName: "ย่อรูป.com",
     images: [
       {
         url: "https://ย่อรูป.com/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "Convert to WebP | Online Image Converter"
+        alt: "ย่อรูป Shopee Lazada ออนไลน์ฟรี"
       }
     ],
     locale: "th_TH",
@@ -46,7 +48,8 @@ export const metadata = {
   },
   icons: {
     icon: "/favicon.ico"
-  }
+  },
+  metadataBase: new URL("https://ย่อรูป.com"),
 };
 
 export default function RootLayout({ children }) {
