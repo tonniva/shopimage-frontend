@@ -46,6 +46,16 @@ export const metadata = {
     locale: "th_TH",
     type: "website"
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "ย่อรูปสินค้า Shopee Lazada | แปลง WebP ออนไลน์ฟรี",
+    description:
+      "ลดขนาดรูปภาพ คมชัด ไม่แตก เว็บย่อรูปฟรี รองรับ Shopee Lazada ใช้งานง่าย ไม่ต้องสมัครสมาชิก",
+    images: ["https://ย่อรูป.com/og-image.jpg"]
+  },
+  alternates: {
+    canonical: "https://ย่อรูป.com"
+  },
   icons: {
     icon: "/favicon.ico"
   },
