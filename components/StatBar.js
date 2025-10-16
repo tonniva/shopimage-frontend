@@ -3,14 +3,14 @@ export function StatBar({ files = [], results = [], quota }) {
   const filesCount = files?.length || 0;
   const doneCount = results?.filter((r) => r?.ok).length || 0;
 
-  const plan = quota?.plan?.toUpperCase?.() || "—";
+  const plan = quota?.plan?.toUpperCase?.() || "FREE";
   const remDay =
     quota?.remaining_day === null || quota?.remaining_day === undefined
       ? "∞"
       : quota.remaining_day;
   const remMonth =
     quota?.remaining_month === null || quota?.remaining_month === undefined
-      ? "—"
+      ? "∞"
       : quota.remaining_month;
 
   return (
