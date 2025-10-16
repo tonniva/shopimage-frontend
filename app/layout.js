@@ -1,12 +1,11 @@
-// app/layout.js
 import "./globals.css";
 import { Toaster } from "sonner";
 import AppHeader from "@/components/AppHeader";
 import AppFooter from "@/components/AppFooter";
 import AuthProvider from "@/components/AuthProvider";
+import Script from "next/script";
 
 // ✅ SEO Metadata
-
 export const metadata = {
   title: "Convert to WebP | ลดขนาดรูปภาพออนไลน์ฟรี แปลงภาพ WebP/JPG/PNG",
   description:
@@ -51,8 +50,29 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+  const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
+
   return (
     <html lang="th">
+      <head>
+        {/* ✅ Google Analytics */}
+        {GA_ID && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script id="ga-setup" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${GA_ID}');
+              `}
+            </Script>
+          </>
+        )}
+      </head>
       <body className="antialiased">
         <AuthProvider>
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
