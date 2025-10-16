@@ -93,6 +93,7 @@ export function SettingsPanel({ value, onChange, onSubmit, loading, onPreset, se
                 id={mid}
                 type="number"
                 min="1"
+                max="8"
                 step="1"
                 value={value.max_upload_mb}
                 onChange={set("max_upload_mb")}
