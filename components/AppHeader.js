@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { useState } from "react";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
@@ -38,6 +39,7 @@ const NavLink = ({ href, children }) => {
 };
 
 export default function AppHeader() {
+  const [hover, setHover] = useState(false);
   const { user, ready } = useAuth();
   const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
@@ -60,6 +62,7 @@ export default function AppHeader() {
   const BMAC_URL = "https://www.buymeacoffee.com/mulufabo"; // เปลี่ยนเป็นของคุณ
   const QR_SRC = "/qr-code.png"; // วางไฟล์ไว้ที่ public/qr-bmac.png
   const LOGO = "/logo.png"; // วางไฟล์ไว้ที่ public/qr-bmac.png
+  const LOGO_SM = "/image_sm.png"; // วางไฟล์ไว้ที่ public/qr-bmac.png
 
   return (
     <header className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-black">
@@ -68,21 +71,21 @@ export default function AppHeader() {
           {/* Left: Brand + nav */}
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <Link
-                href="/"
-                className="text-lg font-semibold tracking-tight    px-2 py-1   hover:-translate-y-0.5 hover:shadow-[3px_3px_0_#000] transition-all"
-              >
-                <div className="p-2 border border-black rounded-2xl bg-white hover:-translate-y-0.5 hover:shadow-[3px_3px_0_#000] transition">
-                  <Image
-                    src={LOGO}
-                    alt="Buy Me a Coffee QR — 100% goes to cat food"
-                    width={100}
-                    height={100}
-                    className="rounded-xl"
-                    priority
-                  />
-                </div>
-              </Link>
+            <Link
+            href="/"
+            onMouseEnter={() => setHover(true)}
+            onMouseLeave={() => setHover(false)}
+            className="p-2 border border-black rounded-2xl bg-white hover:-translate-y-0.5 hover:shadow-[3px_3px_0_#000] transition"
+          >
+            <Image
+              src={hover ? LOGO_SM : LOGO}
+              alt="Cat Logo"
+              width={100}
+              height={100}
+              className="rounded-xl"
+              priority
+            />
+          </Link>
           
               {/* <span className="hidden sm:inline text-xs text-gray-500">v1</span> */}
             </div>
