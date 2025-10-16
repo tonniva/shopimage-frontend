@@ -6,6 +6,7 @@ import AppFooter from "@/components/AppFooter";
 import AuthProvider from "@/components/AuthProvider";
 
 // ✅ SEO Metadata
+
 export const metadata = {
   title: "Convert to WebP | ลดขนาดรูปภาพออนไลน์ฟรี แปลงภาพ WebP/JPG/PNG",
   description:
@@ -23,18 +24,19 @@ export const metadata = {
     "บีบอัดรูปภาพออนไลน์",
     "แปลงรูป Shopee",
     "แปลงรูป Lazada",
-    "ขายของออนไลน์"
+    "ขายของออนไลน์",
+    "แปลงรูป WebP คุณภาพดี"
   ],
   authors: [{ name: "To WebP" }],
   openGraph: {
     title: "Convert to WebP | ลดขนาดรูปออนไลน์ฟรี",
     description:
       "เครื่องมือแปลงรูป WebP / JPEG / PNG ออนไลน์ ความละเอียดสูง ใช้งานง่าย เหมาะสำหรับพ่อค้าแม่ค้าออนไลน์",
-    url: "https://your-domain.com",
+    url: "https://ย่อรูป.com",
     siteName: "To WebP",
     images: [
       {
-        url: "https://your-domain.com/og-image.jpg",
+        url: "https://ย่อรูป.com/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "Convert to WebP | Online Image Converter"
