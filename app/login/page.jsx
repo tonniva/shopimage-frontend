@@ -13,8 +13,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
 
   // ถ้าล็อกอินแล้ว → เด้งไป /dashboard
-  useEffect(() => {
-    console.log("LoginPage useEffect", { ready, user });
+  useEffect(() => { 
     if (ready && user) router.replace("/dashboard");
   }, [ready, user, router]);
 

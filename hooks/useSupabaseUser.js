@@ -32,14 +32,14 @@ export function useSupabaseUser() {
       const { data: sessData } = await supabase.auth.getSession();
       if (mounted && sessData?.session?.user) {
           setUser(sessData.session.user);
-          console.log("1");
+ 
         setChecking(false);
       } else {
         // 2) ถ้าไม่มีทันที → รอ getUser() แบบ retry ภายใน 2s
         const u = await waitForUser(1000, 150);
         if (mounted) {
             setUser(u);
-            console.log("2");
+      
           setChecking(false);
         }
       }

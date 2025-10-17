@@ -72,9 +72,7 @@ export default function DashboardPage() {
         .gte("created_at", start.toISOString())
         .lte("created_at", end.toISOString());
       
-      if (error) console.error(error);
-      console.log('user.id', user.id);
-      console.log('todayCnt', todayCnt);  
+      if (error) console.error(error); 
 
       // นับเดือนนี้
       const startOfMonth = new Date();

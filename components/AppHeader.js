@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useState, useMemo } from "react";
 import Image from "next/image";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { createClient } from "@/utils/supabase/client";
 
@@ -41,8 +41,8 @@ export default function AppHeader() {
   const [hover, setHover] = useState(false);
   const { user, ready } = useAuth();
   const router = useRouter();
-  const search = useSearchParams();
-  const pathname = usePathname();
+  // const search = useSearchParams();
+   const pathname = usePathname();
 
   const supabase = useMemo(() => createClient(), []);
 
@@ -53,8 +53,12 @@ export default function AppHeader() {
     ? pathname.replace(/^\/en/, "") || "/"
     : (pathname === "/" ? "/en" : `/en${pathname}`);
   // เก็บ query เดิม
-  const qs = search?.toString();
-  const switchHref = qs ? `${targetPath}?${qs}` : targetPath;
+  // const qs = search?.toString();
+  const switchHref = isEN
+  ? pathname.replace(/^\/en/, "") || "/"
+  : pathname === "/"
+    ? "/en"
+    : `/en${pathname}`;
 
   const handleLogout = async () => {
     try {

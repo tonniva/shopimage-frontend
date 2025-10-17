@@ -61,13 +61,11 @@ export function SettingsPanel({
   lang, // optional: "th" | "en"
 }) {
   const pathname = usePathname();
-  const L = useMemo(() => {
-    console.log("SettingsPanel lang:", lang, "pathname:", pathname);
+  const L = useMemo(() => { 
     if (lang === "th" || lang === "en") return DICT[lang];
     // auto-detect from pathname
     //return pathname?.startsWith("/en") ? DICT.en : DICT.th;
-  }, [lang, pathname]);
-  console.log("SettingsPanel L:", L);
+  }, [lang, pathname]); 
 
   const wid = useId(),
     hid = useId(),
