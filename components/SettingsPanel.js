@@ -1,6 +1,7 @@
 "use client";
 
-import { useId } from "react";
+import { useId, useMemo,useState } from "react";
+import { usePathname } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,9 +9,72 @@ import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import PresetCards from "@/components/PresetCards";
 
+/**
+ * i18n dictionary
+ */
+const DICT = {
+  th: {
+    width: "Width (px)",
+    height: "Height (px)",
+    widthHint: "ว่างทั้งคู่ = ไม่ปรับขนาด (ใช้รูปเดิม)",
+    heightHint: "ใส่ทั้งคู่ → ครอปกลางให้อัตราส่วนพอดี",
+    format: "Format",
+    formatWebp: "WebP (แนะนำ: เล็ก/คม)",
+    formatJpeg: "JPEG (รองรับกว้าง)",
+    maxUpload: "Max upload per file",
+    maxUploadHint: "กำหนดเพดานไฟล์ที่อัปโหลด (ดีฟอลต์ 8MB)",
+    maxOutput: "Max output size",
+    maxOutputHint: "คุมขนาดไฟล์ผลลัพธ์สูงสุด (ดีฟอลต์ 400KB)",
+    convert: "Convert",
+    converting: "กำลังแปลง...",
+    unitPx: "px",
+    unitMB: "MB",
+    unitKB: "KB",
+  },
+  en: {
+    width: "Width (px)",
+    height: "Height (px)",
+    widthHint: "Leave both empty = keep original size",
+    heightHint: "Fill both → center-crop to match aspect ratio",
+    format: "Format",
+    formatWebp: "WebP (Recommended: smaller/sharper)",
+    formatJpeg: "JPEG (Broad support)",
+    maxUpload: "Max upload per file",
+    maxUploadHint: "Cap the per-file upload size (default 8MB)",
+    maxOutput: "Max output size",
+    maxOutputHint: "Limit the output file size (default 400KB)",
+    convert: "Convert",
+    converting: "Processing…",
+    unitPx: "px",
+    unitMB: "MB",
+    unitKB: "KB",
+  },
+};
 
-export function SettingsPanel({ value, onChange, onSubmit, loading, onPreset, selectedPreset }) {
-  const wid = useId(), hid = useId(), fid = useId(), mid = useId(), sk = useId();
+export function SettingsPanel({
+  value,
+  onChange,
+  onSubmit,
+  loading,
+  onPreset,
+  selectedPreset,
+  lang, // optional: "th" | "en"
+}) {
+  const pathname = usePathname();
+  const L = useMemo(() => {
+    console.log("SettingsPanel lang:", lang, "pathname:", pathname);
+    if (lang === "th" || lang === "en") return DICT[lang];
+    // auto-detect from pathname
+    //return pathname?.startsWith("/en") ? DICT.en : DICT.th;
+  }, [lang, pathname]);
+  console.log("SettingsPanel L:", L);
+
+  const wid = useId(),
+    hid = useId(),
+    fid = useId(),
+    mid = useId(),
+    sk = useId();
+
   const set = (k) => (e) => onChange({ ...value, [k]: e.target.value });
 
   const Field = ({ children }) => (
@@ -19,38 +83,46 @@ export function SettingsPanel({ value, onChange, onSubmit, loading, onPreset, se
     </div>
   );
 
+  const [test, setTest] = useState(""); // ✅ สร้างตัวแปรธรรมดา test
   return (
     <Card className="border border-black bg-white">
       <CardContent className="p-2 space-y-2">
-        {/* W/H */}
+        {/* Presets */}
         <PresetCards onPreset={onPreset} selected={selectedPreset} />
+
+        {/* W/H */}
         <div className="grid grid-cols-2 gap-4">
+          {/* Width */}
           <div className="space-y-2">
             <Label htmlFor={wid} className="text-[13px] font-semibold">
-              Width (px)
+              {L.width}
             </Label>
-            <Field>
+ 
+            <div className="rounded-xl border border-black/70 bg-gray-50 shadow-inner p-3">
               <div className="relative">
+
                 <Input
                   id={wid}
                   inputMode="numeric"
                   placeholder=""
                   value={value.target_w}
                   onChange={set("target_w")}
-                  className="bg-white/60 border border-black/70 focus:bg-white
-                             focus:ring-2 focus:ring-black pr-[15px]"
+                  className="bg-white/60 border border-black/70 focus:bg-white focus:ring-2 focus:ring-black pr-[15px]"
                 />
-                <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500">px</span>
+                <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500">
+                  {L.unitPx}
+                </span>
               </div>
-            </Field>
-            <p className="text-[11px] text-gray-500">ว่างทั้งคู่ = ไม่ปรับขนาด (ใช้รูปเดิม)</p>
+            </div>
+            <p className="text-[11px] text-gray-500">{L.widthHint}</p>
           </div>
 
+          {/* Height */}
           <div className="space-y-2">
             <Label htmlFor={hid} className="text-[13px] font-semibold">
-              Height (px)
+              {L.height}
             </Label>
-            <Field>
+            <div className="rounded-xl border border-black/70 bg-gray-50 shadow-inner p-3">
               <div className="relative">
                 <Input
                   id={hid}
@@ -58,19 +130,22 @@ export function SettingsPanel({ value, onChange, onSubmit, loading, onPreset, se
                   placeholder=""
                   value={value.target_h}
                   onChange={set("target_h")}
-                  className="bg-white/60 border border-black/70 focus:bg-white
-                             focus:ring-2 focus:ring-black pr-[15px]"
+                  className="bg-white/60 border border-black/70 focus:bg-white focus:ring-2 focus:ring-black pr-[15px]"
                 />
-                <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500">px</span>
+                <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500">
+                  {L.unitPx}
+                </span>
               </div>
-            </Field>
-            <p className="text-[11px] text-gray-500">ใส่ทั้งคู่ → ครอปกลางให้อัตราส่วนพอดี</p>
+            </div>
+            <p className="text-[11px] text-gray-500">{L.heightHint}</p>
           </div>
         </div>
 
         {/* Format */}
         <div className="space-y-2">
-          <Label htmlFor={fid} className="text-[13px] font-semibold">Format</Label>
+          <Label htmlFor={fid} className="text-[13px] font-semibold">
+            {L.format}
+          </Label>
           <Field>
             <Select
               id={fid}
@@ -78,38 +153,50 @@ export function SettingsPanel({ value, onChange, onSubmit, loading, onPreset, se
               onChange={set("format")}
               className="w-full bg-white/60 border border-black/70 focus:ring-2 focus:ring-black"
             >
-              <option value="webp">WebP (แนะนำ: เล็ก/คม)</option>
-              <option value="jpeg">JPEG (รองรับกว้าง)</option>
+              <option value="webp">{L.formatWebp}</option>
+              <option value="jpeg">{L.formatJpeg}</option>
             </Select>
           </Field>
         </div>
 
-        {/* Max upload per file */}
+        {/* Max upload per file (MB) */}
         <div className="space-y-2">
-          <Label htmlFor={mid} className="text-[13px] font-semibold">Max upload per file</Label>
-          <Field>
+          <Label htmlFor={mid} className="text-[13px] font-semibold">
+            {L.maxUpload}
+          </Label>
+          <div className="rounded-xl border border-black/70 bg-gray shadow-inner p-3">
             <div className="relative">
-              <Input
-                id={mid}
-                type="number"
-                min="1"
-                max="8"
-                step="1"
-                value={value.max_upload_mb}
-                onChange={set("max_upload_mb")}
-                className="bg-white/60 border border-black/70 focus:bg:white
-                           focus:ring-2 focus:ring-black pr-12"
-              />
-              <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500">MB</span>
+            <Input
+                  disabled
+                  id={mid}
+                  type="number"
+                  min="1"
+                  max="32"
+                  step="1"
+                  value={value.max_upload_mb}
+                  onChange={set("max_upload_mb")}
+                  className="
+                    bg-gray-200               
+                    text-gray-500              
+                    border border-black/40     
+                    cursor-not-allowed        
+                    opacity-80
+                  "
+                />
+              <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500">
+                {L.unitMB}
+              </span>
             </div>
-          </Field>
-          <p className="text-[11px] text-gray-500">กำหนดเพดานไฟล์ที่อัปโหลด (ดีฟอลต์ 8MB)</p>
+          </div>
+          <p className="text-[11px] text-gray-500">{L.maxUploadHint}</p>
         </div>
 
-        {/* Max output size */}
+        {/* Max output size (KB) */}
         <div className="space-y-2">
-          <Label htmlFor={sk} className="text-[13px] font-semibold">Max output size</Label>
-          <Field>
+          <Label htmlFor={sk} className="text-[13px] font-semibold">
+            {L.maxOutput}
+          </Label>
+          <div className="rounded-xl border border-black/70 bg-gray-50 shadow-inner p-3">
             <div className="relative">
               <Input
                 id={sk}
@@ -118,15 +205,17 @@ export function SettingsPanel({ value, onChange, onSubmit, loading, onPreset, se
                 step="50"
                 value={value.max_kb}
                 onChange={set("max_kb")}
-                className="bg:white/60 border border-black/70 focus:bg-white
-                           focus:ring-2 focus:ring-black pr-12"
+                className="bg-white/60 border border-black/70 focus:bg-white focus:ring-2 focus:ring-black pr-12"
               />
-              <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500">KB</span>
+              <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500">
+                {L.unitKB}
+              </span>
             </div>
-          </Field>
-          <p className="text-[11px] text-gray-500">คุมขนาดไฟล์ผลลัพธ์สูงสุด (ดีฟอลต์ 400KB)</p>
+          </div>
+          <p className="text-[11px] text-gray-500">{L.maxOutputHint}</p>
         </div>
 
+        {/* Submit */}
         <Button
           className="w-full border border-black bg-black text-black
                      transition-all duration-150
@@ -135,7 +224,7 @@ export function SettingsPanel({ value, onChange, onSubmit, loading, onPreset, se
           onClick={onSubmit}
           disabled={loading}
         >
-          {loading ? "กำลังแปลง..." : "Convert"}
+          {loading ? L.converting : L.convert}
         </Button>
       </CardContent>
     </Card>

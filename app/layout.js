@@ -54,7 +54,10 @@ export const metadata = {
     images: ["https://ย่อรูป.com/og-image.jpg"]
   },
   alternates: {
-    canonical: "https://ย่อรูป.com"
+    languages: {
+      th: "https://ย่อรูป.com",
+      en: "https://ย่อรูป.com/en",
+    },
   },
   icons: {
     icon: "/favicon.ico"

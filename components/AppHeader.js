@@ -1,11 +1,10 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { createClient } from "@/utils/supabase/client";
-import { useMemo } from "react";
 
 function HeaderButton({ className = "", children, ...props }) {
   const base =
@@ -42,7 +41,20 @@ export default function AppHeader() {
   const [hover, setHover] = useState(false);
   const { user, ready } = useAuth();
   const router = useRouter();
+  const search = useSearchParams();
+  const pathname = usePathname();
+
   const supabase = useMemo(() => createClient(), []);
+
+  // --- สร้างลิงก์สลับภาษา (คง query string เดิม) ---
+  const isEN = pathname?.startsWith("/en");
+  // path ปลายทาง
+  const targetPath = isEN
+    ? pathname.replace(/^\/en/, "") || "/"
+    : (pathname === "/" ? "/en" : `/en${pathname}`);
+  // เก็บ query เดิม
+  const qs = search?.toString();
+  const switchHref = qs ? `${targetPath}?${qs}` : targetPath;
 
   const handleLogout = async () => {
     try {
@@ -59,38 +71,36 @@ export default function AppHeader() {
   };
 
   // === Config ===
-  const BMAC_URL = "https://www.buymeacoffee.com/mulufabo"; // เปลี่ยนเป็นของคุณ
-  const QR_SRC = "/qr-code.png"; // วางไฟล์ไว้ที่ public/qr-bmac.png
-  const LOGO = "/logo.png"; // วางไฟล์ไว้ที่ public/qr-bmac.png
-  const LOGO_SM = "/image_sm.png"; // วางไฟล์ไว้ที่ public/qr-bmac.png
+  const BMAC_URL = "https://www.buymeacoffee.com/mulufabo";
+  const QR_SRC = "/qr-code.png";
+  const LOGO = "/logo.png";
+  const LOGO_SM = "/image_sm.png";
 
   return (
     <header className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-black">
       <div className="mx-auto max-w-6xl px-4">
         <div className="h-auto py-2 md:py-0 md:h-16 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-          {/* Left: Brand + nav */}
+          {/* Left: Brand */}
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-            <Link
-            href="/"
-            onMouseEnter={() => setHover(true)}
-            onMouseLeave={() => setHover(false)}
-            className="p-2 border border-black rounded-2xl bg-white hover:-translate-y-0.5 hover:shadow-[3px_3px_0_#000] transition"
-          >
-            <Image
-              src={hover ? LOGO_SM : LOGO}
-              alt="Cat Logo"
-              width={100}
-              height={100}
-              className="rounded-xl"
-              priority
-            />
-          </Link>
-          
-              {/* <span className="hidden sm:inline text-xs text-gray-500">v1</span> */}
+              <Link
+                href="/"
+                onMouseEnter={() => setHover(true)}
+                onMouseLeave={() => setHover(false)}
+                className="p-2 border border-black rounded-2xl bg-white hover:-translate-y-0.5 hover:shadow-[3px_3px_0_#000] transition"
+              >
+                <Image
+                  src={hover ? LOGO_SM : LOGO}
+                  alt="Cat Logo"
+                  width={100}
+                  height={100}
+                  className="rounded-xl"
+                  priority
+                />
+              </Link>
             </div>
 
-            {/* Mobile: QR button shortcut */}
+            {/* Mobile: Support */}
             <Link
               href={BMAC_URL}
               target="_blank"
@@ -103,8 +113,18 @@ export default function AppHeader() {
             </Link>
           </div>
 
-          {/* Right: Auth */}
+          {/* Right: Auth + Lang */}
           <div className="flex items-center gap-2 md:order-3">
+            {/* ปุ่มสลับภาษา */}
+            <Link
+              href={switchHref}
+              className="px-3 py-1 border border-black rounded-xl text-sm bg-white hover:-translate-y-0.5 hover:shadow-[3px_3px_0_#000] transition"
+              aria-label="Switch language"
+              title={isEN ? "สลับเป็นภาษาไทย" : "Switch to English"}
+            >
+              {isEN ? "ไทย" : "EN"}
+            </Link>
+
             {!ready ? (
               <span className="text-xs text-gray-500">Checking…</span>
             ) : user ? (
@@ -122,21 +142,17 @@ export default function AppHeader() {
                 </div>
                 <HeaderButton onClick={handleLogout}>Logout</HeaderButton>
               </>
-              ) :
-                (
+            ) : (
               <>
                 {/* <NavLink href="/login">Login</NavLink>
                 <NavLink href="/register">Register</NavLink> */}
               </>
-            )
-            
-            }
+            )}
           </div>
 
-          {/* Center/Right: Support block (QR + texts) */}
+          {/* Center/Right: Support block */}
           <div className="md:order-2 w-full">
             <div className="flex w-full items-center justify-between gap-4">
-              {/* Messages */}
               <div className="flex-1 min-w-0 pb-2">
                 <p className="text-base md:text-lg font-semibold tracking-tight">
                   Every donation = cat food 🐱❤️
@@ -145,11 +161,10 @@ export default function AppHeader() {
                   Your support means food and love for my cats ❤️🐱
                 </p>
                 <p className="text-[11px] md:text-xs text-gray-500">
-                  100% of all support is used for cat food only.  👉 *Files auto deleted after midnight 🔥
-                </p>  
+                  100% of all support is used for cat food only. 👉 *Files auto deleted after midnight 🔥
+                </p>
               </div>
 
-              {/* QR */}
               <Link
                 href={BMAC_URL}
                 target="_blank"

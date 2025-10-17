@@ -1,36 +1,51 @@
-// components/UploadBox.js
 "use client";
 
-import { useRef, useEffect, useState, useCallback } from "react";
+import { useRef, useEffect, useState, useCallback, useMemo } from "react";
 import { ImagePlus, Trash2, AlertTriangle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
-const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
 
 function formatKB(n) {
   return Math.max(1, Math.round(n / 1024)) + " KB";
 }
 
-export function UploadBox({ files, setFiles }) {
+const DICT = {
+  th: {
+    dropTitle: "ลากไฟล์มาวาง หรือคลิกเลือกหลาย ๆ รูปได้",
+    dropNote: "รองรับเฉพาะ .jpg / .jpeg / .png / .webp",
+    chooseFiles: "เลือกไฟล์",
+    clearList: "ล้างรายการ",
+    selectedCount: (n) => `เลือกแล้ว ${n} ไฟล์`,
+    notSupported: "ไม่รองรับไฟล์:",
+    removeThis: "ลบรูปนี้",
+    dropzoneLabel: "โซนวางไฟล์",
+  },
+  en: {
+    dropTitle: "Drag & drop images or click to select multiple",
+    dropNote: "Only .jpg / .jpeg / .png / .webp are supported",
+    chooseFiles: "Choose files",
+    clearList: "Clear list",
+    selectedCount: (n) => `Selected ${n} files`,
+    notSupported: "Unsupported:",
+    removeThis: "Remove this image",
+    dropzoneLabel: "Dropzone",
+  },
+};
+
+export function UploadBox({ files, setFiles, lang = "th" }) {
+  // เลือกชุดข้อความตามภาษา (default -> th)
+  const L = useMemo(() => (DICT[lang] ? DICT[lang] : DICT.th), [lang]);
+
   const inputRef = useRef(null);
   const [previews, setPreviews] = useState([]); // [{url, name, size, type, idx}]
   const [isOver, setIsOver] = useState(false);
-  const [invalidNames, setInvalidNames] = useState([]); // ชื่อไฟล์ที่ไม่รองรับ
+  const [invalidNames, setInvalidNames] = useState([]); // เก็บชื่อไฟล์ที่ไม่รองรับ
 
-  // สร้าง object URLs สำหรับ preview และล้างเมื่อเปลี่ยน/ออก
+  // อัปเดต preview URLs อย่างปลอดภัย และ revoke URL เก่าเมื่อ files เปลี่ยน
   useEffect(() => {
-    // ล้าง URL เก่า
-    return () => {
-      previews.forEach((p) => URL.revokeObjectURL(p.url));
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    // ล้าง URL เก่าก่อนสร้างใหม่
-    previews.forEach((p) => URL.revokeObjectURL(p.url));
     const next = (files || []).map((f, idx) => ({
       url: URL.createObjectURL(f),
       name: f.name,
@@ -39,7 +54,11 @@ export function UploadBox({ files, setFiles }) {
       idx,
     }));
     setPreviews(next);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
+    // cleanup: revoke URLs ที่เพิ่งสร้างเมื่อ files เปลี่ยนหรือ component unmount
+    return () => {
+      next.forEach((p) => URL.revokeObjectURL(p.url));
+    };
   }, [files]);
 
   const addFiles = useCallback(
@@ -50,44 +69,45 @@ export function UploadBox({ files, setFiles }) {
       const invalid = [];
       const valid = [];
 
-      // แยกไฟล์ถูก/ผิดประเภท
       for (const f of incoming) {
         if (allowedTypes.includes(f.type)) valid.push(f);
         else invalid.push(f.name);
       }
 
       if (invalid.length) {
-        setInvalidNames((prev) => [...prev, ...invalid]);
-        toast.error(`ไม่รองรับไฟล์: ${invalid.join(", ")}`);
+        // กันชื่อซ้ำใน invalid
+        setInvalidNames((prev) => {
+          const merged = new Set([...prev, ...invalid]);
+          return Array.from(merged);
+        });
+        toast.error(`${L.notSupported} ${invalid.join(", ")}`);
       }
 
       if (!valid.length) return;
 
-      // กันไฟล์ซ้ำ (ชื่อ+ขนาด) แบบง่าย ๆ
-      const exists = new Set((files || []).map((f) => `${f.name}-${f.size}`));
-      const merged = [
-        ...(files || []),
-        ...valid.filter((f) => !exists.has(`${f.name}-${f.size}`)),
-      ];
-      setFiles(merged);
+      // ใช้ฟังก์ชันใน setFiles เพื่อลด stale closure
+      setFiles((prevFiles = []) => {
+        const exists = new Set(prevFiles.map((f) => `${f.name}-${f.size}`));
+        const toAdd = valid.filter((f) => !exists.has(`${f.name}-${f.size}`));
+        return [...prevFiles, ...toAdd];
+      });
     },
-    [files, setFiles]
+    [setFiles, L.notSupported]
   );
 
-  // ลบไฟล์ตาม index
   const removeAt = (idx) => {
-    const arr = [...files];
-    arr.splice(idx, 1);
-    setFiles(arr);
+    setFiles((prev = []) => {
+      const arr = [...prev];
+      arr.splice(idx, 1);
+      return arr;
+    });
   };
 
-  // ล้างทั้งหมด
   const clearAll = () => {
     setFiles([]);
     setInvalidNames([]);
   };
 
-  // Drag & drop handlers
   const onDrop = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -116,7 +136,7 @@ export function UploadBox({ files, setFiles }) {
         <div
           role="button"
           tabIndex={0}
-          aria-label="Dropzone"
+          aria-label={L.dropzoneLabel}
           className={[
             "rounded-2xl p-6 text-center",
             "border-2 border-dashed",
@@ -136,17 +156,16 @@ export function UploadBox({ files, setFiles }) {
         >
           <ImagePlus className="mb-2" />
           <p className="text-sm text-gray-600">
-            ลากไฟล์มาวาง หรือคลิกเลือกหลาย ๆ รูปได้ <br />
-            <span className="text-xs text-gray-500">
-              รองรับเฉพาะ .jpg / .jpeg / .png / .webp
-            </span>
+            {L.dropTitle}
+            <br />
+            <span className="text-xs text-gray-500">{L.dropNote}</span>
           </p>
 
           <input
             ref={inputRef}
             type="file"
             multiple
-            accept="image/jpeg,image/jpg,image/png,image/webp"
+            accept="image/jpeg,image/png,image/webp"
             onChange={(e) => addFiles(e.target.files)}
             className="hidden"
           />
@@ -164,7 +183,7 @@ export function UploadBox({ files, setFiles }) {
                          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
               type="button"
             >
-              เลือกไฟล์
+              {L.chooseFiles}
             </Button>
 
             {files?.length ? (
@@ -181,28 +200,30 @@ export function UploadBox({ files, setFiles }) {
                 type="button"
                 variant="outline"
               >
-                ล้างรายการ
+                {L.clearList}
               </Button>
             ) : null}
           </div>
 
           {files?.length ? (
-            <p className="text-sm text-gray-500 mt-3">เลือกแล้ว {files.length} ไฟล์</p>
+            <p className="text-sm text-gray-500 mt-3">
+              {typeof L.selectedCount === "function"
+                ? L.selectedCount(files.length)
+                : `${files.length}`}
+            </p>
           ) : null}
 
-          {/* แจ้งไฟล์ที่ไม่รองรับ (กรณีมี) */}
           {invalidNames.length > 0 && (
             <div className="mt-3 inline-flex items-start gap-2 rounded-md border border-red-300 bg-red-50 px-3 py-2 text-xs text-red-700">
               <AlertTriangle size={16} className="mt-0.5" />
               <div>
-                ไม่รองรับไฟล์:{" "}
+                {L.notSupported}{" "}
                 <span className="font-medium">{invalidNames.join(", ")}</span>
               </div>
             </div>
           )}
         </div>
 
-        {/* Preview grid */}
         {previews.length > 0 && (
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {previews.map((p, i) => (
@@ -238,7 +259,7 @@ export function UploadBox({ files, setFiles }) {
                                hover:-translate-y-0.5 hover:shadow-[3px_3px_0_#000]
                                active:translate-y-0 active:shadow-[2px_2px_0_#000] active:scale-[0.98]
                                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black"
-                    title="ลบรูปนี้"
+                    title={L.removeThis}
                     onClick={() => removeAt(i)}
                     type="button"
                   >
