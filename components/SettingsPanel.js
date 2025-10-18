@@ -59,13 +59,14 @@ export function SettingsPanel({
   onPreset,
   selectedPreset,
   lang, // optional: "th" | "en"
+  hasFiles = false, // NEW: to track if files are uploaded
 }) {
   const pathname = usePathname();
   const L = useMemo(() => { 
     if (lang === "th" || lang === "en") return DICT[lang];
     // auto-detect from pathname
     //return pathname?.startsWith("/en") ? DICT.en : DICT.th;
-  }, [lang, pathname]); 
+  }, [lang]); 
 
   const wid = useId(),
     hid = useId(),
@@ -215,10 +216,11 @@ export function SettingsPanel({
 
         {/* Submit */}
         <Button
-          className="w-full border border-black bg-black text-black
+          className={`w-full border border-black bg-black text-black
                      transition-all duration-150
                      hover:-translate-y-0.5 hover:shadow-[4px_4px_0_#000]
-                     active:translate-y-0 active:shadow-[2px_2px_0_#000] active:scale-[0.98]"
+                     active:translate-y-0 active:shadow-[2px_2px_0_#000] active:scale-[0.98]
+                     ${!loading && hasFiles ? 'convert-ready' : ''}`}
           onClick={onSubmit}
           disabled={loading}
         >

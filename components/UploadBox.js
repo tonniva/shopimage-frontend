@@ -141,10 +141,10 @@ export function UploadBox({ files, setFiles, lang = "th" }) {
             "rounded-2xl p-6 text-center",
             "border-2 border-dashed",
             "transition-all duration-150",
-            "flex flex-col items-center justify-center bg-white",
+            "flex flex-col items-center justify-center",
             isOver
-              ? "border-black ring-2 ring-black -translate-y-0.5 shadow-[4px_4px_0_#000]"
-              : "border-gray-400",
+              ? "border-blue-600 bg-blue-50 ring-2 ring-blue-500 -translate-y-0.5 shadow-[4px_4px_0_rgba(59,130,246,0.3)]"
+              : "border-blue-500 bg-blue-50/30",
           ].join(" ")}
           onDrop={onDrop}
           onDragOver={onDragOver}
@@ -165,7 +165,7 @@ export function UploadBox({ files, setFiles, lang = "th" }) {
             ref={inputRef}
             type="file"
             multiple
-            accept="image/jpeg,image/png,image/webp"
+            accept="image/jpeg,image/jpg,image/png,image/webp"
             onChange={(e) => addFiles(e.target.files)}
             className="hidden"
           />

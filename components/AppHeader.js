@@ -1,193 +1,151 @@
 "use client";
 import Link from "next/link";
-import { useState, useMemo } from "react";
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
-import { useAuth } from "@/components/AuthProvider";
-import { createClient } from "@/utils/supabase/client";
+import { useState, useEffect } from "react";
+import { AuthHeader } from "@/components/AuthHeader";
+import { ImageIcon, FileText } from "lucide-react";
 
-function HeaderButton({ className = "", children, ...props }) {
-  const base =
-    "inline-flex items-center justify-center rounded-2xl px-4 py-2 text-sm font-medium shadow-sm border border-black bg-white transition";
-  return (
-    <button
-      className={`${base} hover:-translate-y-0.5 hover:shadow-[3px_3px_0_#000] ${className}`}
-      {...props}
-    >
-      {children}
-    </button>
-  );
-}
-
-const NavLink = ({ href, children }) => {
-  const pathname = usePathname();
-  const active = pathname === href;
-  return (
-    <Link
-      href={href}
-      className={[
-        "px-2 py-1 rounded-md text-sm transition-all duration-150 border",
-        active
-          ? "bg-black text-white border-black shadow-[3px_3px_0_#000]"
-          : "bg-white text-black border-black hover:-translate-y-0.5 hover:shadow-[3px_3px_0_#000]",
-      ].join(" ")}
-    >
-      {children}
-    </Link>
-  );
-};
-
+// Professional UX/UI optimized header
 export default function AppHeader() {
-  const [hover, setHover] = useState(false);
-  const { user, ready } = useAuth();
-  const router = useRouter();
-  // const search = useSearchParams();
-   const pathname = usePathname();
-
-  const supabase = useMemo(() => createClient(), []);
-
-  // --- สร้างลิงก์สลับภาษา (คง query string เดิม) ---
-  const isEN = pathname?.startsWith("/en");
-  // path ปลายทาง
-  const targetPath = isEN
-    ? pathname.replace(/^\/en/, "") || "/"
-    : (pathname === "/" ? "/en" : `/en${pathname}`);
-  // เก็บ query เดิม
-  // const qs = search?.toString();
-  const switchHref = isEN
-  ? pathname.replace(/^\/en/, "") || "/"
-  : pathname === "/"
-    ? "/en"
-    : `/en${pathname}`;
-
-  const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut();
-      localStorage.removeItem("supabase.auth.token");
-      localStorage.removeItem("sb-access-token");
-      localStorage.removeItem("sb-refresh-token");
-      localStorage.removeItem("sb-zrpqkfqkbjrulawdpwsf-auth-token");
-      sessionStorage.clear();
-      router.replace("/");
-    } catch (err) {
-      console.error("Logout error:", err);
-    }
-  };
-
-  // === Config ===
-  const BMAC_URL = "https://www.buymeacoffee.com/mulufabo";
-  const QR_SRC = "/qr-code.png";
+  const [isMounted, setIsMounted] = useState(false);
   const LOGO = "/logo.png";
-  const LOGO_SM = "/image_sm.png";
+  const BMAC_URL = "https://www.buymeacoffee.com/mulufabo";
 
-  return (
-    <header className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-black">
-      <div className="mx-auto max-w-6xl px-4">
-        <div className="h-auto py-2 md:py-0 md:h-16 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-          {/* Left: Brand */}
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <Link
-                href="/"
-                onMouseEnter={() => setHover(true)}
-                onMouseLeave={() => setHover(false)}
-                className="p-2 border border-black rounded-2xl bg-white hover:-translate-y-0.5 hover:shadow-[3px_3px_0_#000] transition"
-              >
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    // Return a simplified version for SSR
+    return (
+      <header className="sticky top-0 z-50 bg-white border-b-2 border-black shadow-[0_4px_12px_rgba(0,0,0,0.08)]">
+        <div className="mx-auto max-w-7xl px-4 py-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Link href="/" className="flex-shrink-0 p-2 border-2 border-black rounded-xl bg-white">
                 <Image
-                  src={hover ? LOGO_SM : LOGO}
-                  alt="Cat Logo"
-                  width={100}
-                  height={100}
-                  className="rounded-xl"
+                  src={LOGO}
+                  alt="Logo"
+                  width={64}
+                  height={64}
+                  className="w-16 h-16 rounded-xl"
                   priority
                 />
               </Link>
+              <div className="px-4 py-2 border-2 border-black rounded-xl bg-white">
+                <span className="text-sm font-semibold">Convert</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="px-3 py-2 border-2 border-black rounded-lg bg-white">
+                <span className="text-sm font-semibold">EN</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+    );
+  }
+
+  return (
+    <header className="sticky top-0 z-50 bg-white border-b-2 border-black shadow-[0_4px_12px_rgba(0,0,0,0.08)]" suppressHydrationWarning>
+      <div className="mx-auto max-w-7xl">
+        {/* Mobile Layout */}
+        <div className="md:hidden">
+          {/* Top Bar: Logo + Convert + Support */}
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+            <div className="flex items-center gap-2">
+              <Link
+                href="/"
+                className="flex-shrink-0 p-1.5 border-2 border-black rounded-xl bg-white hover:bg-gray-50 active:scale-95 transition-all duration-150"
+              >
+                <Image
+                  src={LOGO}
+                  alt="Logo"
+                  width={48}
+                  height={48}
+                  className="w-12 h-12 rounded-lg"
+                  priority
+                />
+              </Link>
+              
+              {/* Menu Buttons */}
+              <Link
+                href="/"
+                className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold border-2 border-black bg-gradient-to-br from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 active:scale-95 transition-all duration-150"
+              >
+                <ImageIcon size={16} className="text-blue-600" />
+                <span className="hidden sm:inline">IMG to WEBP</span>
+                <span className="sm:hidden">IMG</span>
+              </Link>
+
+              <Link
+                href="/pdf-converter"
+                className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold border-2 border-black bg-gradient-to-br from-red-50 to-red-100 hover:from-red-100 hover:to-red-200 active:scale-95 transition-all duration-150"
+              >
+                <FileText size={16} className="text-red-600" />
+                <span className="hidden sm:inline">PDF to JPG</span>
+                <span className="sm:hidden">PDF</span>
+              </Link>
             </div>
 
-            {/* Mobile: Support */}
+            {/* Support Button */}
             <Link
               href={BMAC_URL}
               target="_blank"
               rel="noopener"
-              className="md:hidden inline-flex items-center gap-2 rounded-xl border border-black bg-white px-3 py-1 text-sm hover:-translate-y-0.5 hover:shadow-[3px_3px_0_#000] transition"
-              aria-label="Support Cat Food"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold border-2 border-black bg-yellow-100 hover:bg-yellow-200 active:scale-95 transition-all duration-150"
             >
               <span>Support</span>
-              <span className="text-xs">🐱❤️</span>
+              <span>🐱❤️</span>
             </Link>
           </div>
 
-          {/* Right: Auth + Lang */}
-          <div className="flex items-center gap-2 md:order-3">
-            {/* ปุ่มสลับภาษา */}
+          {/* Bottom Bar: Auth */}
+          <div className="px-4 py-2.5 bg-gray-50">
+            <AuthHeader />
+          </div>
+        </div>
+
+        {/* Desktop Layout */}
+        <div className="hidden md:flex items-center justify-between px-6 lg:px-8 py-4">
+          {/* Left: Logo + Navigation */}
+          <div className="flex items-center gap-4">
             <Link
-              href={switchHref}
-              className="px-3 py-1 border border-black rounded-xl text-sm bg-white hover:-translate-y-0.5 hover:shadow-[3px_3px_0_#000] transition"
-              aria-label="Switch language"
-              title={isEN ? "สลับเป็นภาษาไทย" : "Switch to English"}
+              href="/"
+              className="flex-shrink-0 p-2 border-2 border-black rounded-2xl bg-white hover:bg-gray-50 hover:-translate-y-0.5 hover:shadow-[6px_6px_0_#000] active:translate-y-0 active:shadow-[3px_3px_0_#000] transition-all duration-150"
             >
-              {isEN ? "ไทย" : "EN"}
+              <Image
+                src={LOGO}
+                alt="Logo"
+                width={64}
+                height={64}
+                className="w-16 h-16 rounded-xl"
+                priority
+              />
             </Link>
 
-            {!ready ? (
-              <span className="text-xs text-gray-500">Checking…</span>
-            ) : user ? (
-              <>
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-full bg-black text-white flex items-center justify-center text-xs uppercase">
-                    {user.email?.[0] ?? "U"}
-                  </div>
-                  <Link
-                    href="/dashboard"
-                    className="text-sm text-gray-700 hover:underline max-w-[150px] truncate"
-                  >
-                    {user.email}
-                  </Link>
-                </div>
-                <HeaderButton onClick={handleLogout}>Logout</HeaderButton>
-              </>
-            ) : (
-              <>
-                {/* <NavLink href="/login">Login</NavLink>
-                <NavLink href="/register">Register</NavLink> */}
-              </>
-            )}
+            {/* Menu Buttons */}
+            <Link
+              href="/"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold border-2 border-black bg-gradient-to-br from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 hover:-translate-y-0.5 hover:shadow-[4px_4px_0_#000] active:translate-y-0 active:shadow-[2px_2px_0_#000] transition-all duration-150"
+            >
+              <ImageIcon size={18} className="text-blue-600" />
+              <span>IMG to WEBP</span>
+            </Link>
+
+            <Link
+              href="/pdf-converter"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold border-2 border-black bg-gradient-to-br from-red-50 to-red-100 hover:from-red-100 hover:to-red-200 hover:-translate-y-0.5 hover:shadow-[4px_4px_0_#000] active:translate-y-0 active:shadow-[2px_2px_0_#000] transition-all duration-150"
+            >
+              <FileText size={18} className="text-red-600" />
+              <span>PDF to JPG</span>
+            </Link>
           </div>
 
-          {/* Center/Right: Support block */}
-          <div className="md:order-2 w-full">
-            <div className="flex w-full items-center justify-between gap-4">
-              <div className="flex-1 min-w-0 pb-2">
-                <p className="text-base md:text-lg font-semibold tracking-tight">
-                  Every donation = cat food 🐱❤️
-                </p>
-                <p className="text-xs md:text-sm text-gray-600">
-                  Your support means food and love for my cats ❤️🐱
-                </p>
-                <p className="text-[11px] md:text-xs text-gray-500">
-                  100% of all support is used for cat food only. 👉 *Files auto deleted after midnight 🔥
-                </p>
-              </div>
-
-              <Link
-                href={BMAC_URL}
-                target="_blank"
-                rel="noopener"
-                aria-label="Support on Buy Me a Coffee"
-                className="shrink-0 hidden sm:block"
-              >
-                <div className="p-2 border border-black rounded-2xl bg-white hover:-translate-y-0.5 hover:shadow-[3px_3px_0_#000] transition">
-                  <Image
-                    src={QR_SRC}
-                    alt="Buy Me a Coffee QR — 100% goes to cat food"
-                    width={100}
-                    height={100}
-                    className="rounded-xl"
-                    priority
-                  />
-                </div>
-              </Link>
-            </div>
+          {/* Right: Auth */}
+          <div className="flex-shrink-0">
+            <AuthHeader />
           </div>
         </div>
       </div>

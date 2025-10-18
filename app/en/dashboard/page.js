@@ -1,42 +1,24 @@
-// app/dashboard/page.js
+// app/en/dashboard/page.js
 "use client";
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
-import { usePathname } from "next/navigation";
 import Link from "next/link"; 
 
 const DICT = {
-  th: {
-    dashboard: "Dashboard",
-    hello: "สวัสดี",
-    billing: "Billing",
-    today: "Today",
-    thisMonth: "This Month",
-    plan: "Plan",
-    fromQuota: "จากโควตา",
-    perDay: "/วัน",
-    perMonth: "/เดือน",
-    notes: "หมายเหตุ",
-    note1: "ยอดใช้งานอัปเดตทันทีหลังแปลงรูปสำเร็จ",
-    note2: "Free: 20 รูป/วัน, 1,000 รูป/เดือน · Pro/Business ได้โควตาเพิ่ม",
-    note3: "หากต้องการนับ \"จำนวนรูปในครั้งเดียว\" ให้ส่ง amount 1 ใน usage_log",
-  },
-  en: {
-    dashboard: "Dashboard",
-    hello: "Hello",
-    billing: "Billing",
-    today: "Today",
-    thisMonth: "This Month",
-    plan: "Plan",
-    fromQuota: "out of",
-    perDay: "/day",
-    perMonth: "/month",
-    notes: "Notes",
-    note1: "Usage stats update immediately after successful conversion",
-    note2: "Free: 20 images/day, 1,000 images/month · Pro/Business get higher quotas",
-    note3: "To count multiple images in one batch, send amount 1 in usage_log",
-  },
+  dashboard: "Dashboard",
+  hello: "Hello",
+  billing: "Billing",
+  today: "Today",
+  thisMonth: "This Month",
+  plan: "Plan",
+  fromQuota: "out of",
+  perDay: "/day",
+  perMonth: "/month",
+  notes: "Notes",
+  note1: "Usage stats update immediately after successful conversion",
+  note2: "Free: 20 images/day, 1,000 images/month · Pro/Business get higher quotas",
+  note3: "To count multiple images in one batch, send amount 1 in usage_log",
 };
 
 function Card({ title, value, subtitle, right }) {
@@ -52,11 +34,8 @@ function Card({ title, value, subtitle, right }) {
   );
 }
 
-export default function DashboardPage() {
-  const pathname = usePathname();
-  const isEN = pathname?.startsWith("/en");
-  const L = isEN ? DICT.en : DICT.th;
-
+export default function DashboardPageEN() {
+  const L = DICT;
   const { user, ready } = useAuth();
   const [loading, setLoading] = useState(true);
   const [todayCount, setTodayCount] = useState(0);
@@ -145,3 +124,4 @@ export default function DashboardPage() {
     </main>
   );
 }
+

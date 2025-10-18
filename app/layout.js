@@ -1,8 +1,7 @@
 import "./globals.css";
 import { Toaster } from "sonner";
-import AppHeader from "@/components/AppHeader";
-import AppFooter from "@/components/AppFooter";
 import AuthProvider from "@/components/AuthProvider";
+import LayoutContent from "@/components/LayoutContent";
 import Script from "next/script";
 
 // ✅ SEO Metadata
@@ -91,11 +90,7 @@ export default function RootLayout({ children }) {
       </head>
       <body className="antialiased">
         <AuthProvider>
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <AppHeader />
-            <main className="pt-6 md:pt-8">{children}</main>
-            <AppFooter />
-          </div>
+          <LayoutContent>{children}</LayoutContent>
           <Toaster richColors position="top-right" />
         </AuthProvider>
       </body>

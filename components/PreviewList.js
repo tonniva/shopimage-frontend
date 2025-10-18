@@ -41,7 +41,7 @@ export function PreviewList({ results }) {
             {it.ok ? (
               <>
                 {/* รูปแสดงผล */}
-                <div className="aspect-square overflow-hidden rounded-md border border-black bg-gray-50 flex items-center justify-center">
+                <div className="aspect-square overflow-hidden rounded-md border border-black bg-gray-50 flex items-center justify-center rainbow-border">
                   <img
                     src={it.download_url}
                     alt={it.filename || "converted image"}
