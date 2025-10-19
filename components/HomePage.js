@@ -13,6 +13,7 @@ import { SectionCard } from "@/components/SectionCard";
 import { StatBar } from "@/components/StatBar";
 import { toast } from "sonner";
 import { createClient } from "@/utils/supabase/client";
+import SeoContent from "@/components/SeoContent";
 
 const dict = {
   th: {
@@ -292,6 +293,16 @@ export default function HomePage({ lang = "th" }) {
           </div>
         </div>
       </main>
+
+      {/* SEO Content Section */}
+      <SeoContent lang={lang} />
+
+      {/* Footer Note */}
+      <footer className="border-t-2 border-black bg-white py-6">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 text-center text-sm text-gray-600">
+          <p>© 2025 ย่อรูป.com - เครื่องมือย่อรูปภาพออนไลน์ฟรี สำหรับ Shopee, Lazada และอีคอมเมิร์ซทุกแพลตฟอร์ม</p>
+        </div>
+      </footer>
     </div>
   );
 }

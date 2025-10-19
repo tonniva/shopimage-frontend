@@ -23,4 +23,104 @@
     <priority>0.9</priority>
   </url>
 
+  <!-- How to Reduce Image Size - ภาษาไทย -->
+  <url>
+    <loc>https://ย่อรูป.com/how-to-reduce-image-size</loc>
+    <xhtml:link rel="alternate" hreflang="th" href="https://ย่อรูป.com/how-to-reduce-image-size" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://ย่อรูป.com/en/how-to-reduce-image-size" />
+    <lastmod>2025-01-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- How to Reduce Image Size - English -->
+  <url>
+    <loc>https://ย่อรูป.com/en/how-to-reduce-image-size</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ย่อรูป.com/en/how-to-reduce-image-size" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://ย่อรูป.com/how-to-reduce-image-size" />
+    <lastmod>2025-01-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Convert WebP on Mobile - ภาษาไทย -->
+  <url>
+    <loc>https://ย่อรูป.com/convert-webp-on-mobile</loc>
+    <xhtml:link rel="alternate" hreflang="th" href="https://ย่อรูป.com/convert-webp-on-mobile" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://ย่อรูป.com/en/convert-webp-on-mobile" />
+    <lastmod>2025-01-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Convert WebP on Mobile - English -->
+  <url>
+    <loc>https://ย่อรูป.com/en/convert-webp-on-mobile</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ย่อรูป.com/en/convert-webp-on-mobile" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://ย่อรูป.com/convert-webp-on-mobile" />
+    <lastmod>2025-01-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- WebP vs JPG - ภาษาไทย -->
+  <url>
+    <loc>https://ย่อรูป.com/webp-vs-jpg</loc>
+    <xhtml:link rel="alternate" hreflang="th" href="https://ย่อรูป.com/webp-vs-jpg" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://ย่อรูป.com/en/webp-vs-jpg" />
+    <lastmod>2025-01-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- WebP vs JPG - English -->
+  <url>
+    <loc>https://ย่อรูป.com/en/webp-vs-jpg</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ย่อรูป.com/en/webp-vs-jpg" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://ย่อรูป.com/webp-vs-jpg" />
+    <lastmod>2025-01-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Shopee Image Size - ภาษาไทย -->
+  <url>
+    <loc>https://ย่อรูป.com/shopee-image-size</loc>
+    <xhtml:link rel="alternate" hreflang="th" href="https://ย่อรูป.com/shopee-image-size" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://ย่อรูป.com/en/shopee-image-size" />
+    <lastmod>2025-01-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Shopee Image Size - English -->
+  <url>
+    <loc>https://ย่อรูป.com/en/shopee-image-size</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ย่อรูป.com/en/shopee-image-size" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://ย่อรูป.com/shopee-image-size" />
+    <lastmod>2025-01-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Facebook Image Guide - ภาษาไทย -->
+  <url>
+    <loc>https://ย่อรูป.com/facebook-image-guide</loc>
+    <xhtml:link rel="alternate" hreflang="th" href="https://ย่อรูป.com/facebook-image-guide" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://ย่อรูป.com/en/facebook-image-guide" />
+    <lastmod>2025-01-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Facebook Image Guide - English -->
+  <url>
+    <loc>https://ย่อรูป.com/en/facebook-image-guide</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://ย่อรูป.com/en/facebook-image-guide" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://ย่อรูป.com/facebook-image-guide" />
+    <lastmod>2025-01-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
 </urlset>
