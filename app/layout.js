@@ -88,6 +88,13 @@ export default function RootLayout({ children }) {
             </Script>
           </>
         )}
+        
+        {/* ✅ Impact Tracking */}
+        <Script id="impact-tracking" strategy="afterInteractive">
+          {`
+            (function(i,m,p,a,c,t){c.ire_o=p;c[p]=c[p]||function(){(c[p].a=c[p].a||[]).push(arguments)};t=a.createElement(m);var z=a.getElementsByTagName(m)[0];t.async=1;t.src=i;z.parentNode.insertBefore(t,z)})('https://utt.impactcdn.com/P-A6622999-b6f9-4df3-a315-cea5579174dc1.js','script','impactStat',document,window);impactStat('transformLinks');impactStat('trackImpression');
+          `}
+        </Script>
       </head>
       <body className="antialiased">
         <AuthProvider>
