@@ -79,14 +79,14 @@ export default function AppHeader() {
                 <span className="sm:hidden">IMG</span>
               </Link>
 
-              <Link
+              {/* <Link
                 href="/pdf-converter"
                 className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold border-2 border-black bg-gradient-to-br from-red-50 to-red-100 hover:from-red-100 hover:to-red-200 active:scale-95 transition-all duration-150"
               >
                 <FileText size={16} className="text-red-600" />
                 <span className="hidden sm:inline">PDF to JPG</span>
                 <span className="sm:hidden">PDF</span>
-              </Link>
+              </Link> */}
             </div>
 
             {/* Support Button */}
@@ -134,13 +134,13 @@ export default function AppHeader() {
               <span>IMG to WEBP</span>
             </Link>
 
-            <Link
+            {/* <Link
               href="/pdf-converter"
               className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold border-2 border-black bg-gradient-to-br from-red-50 to-red-100 hover:from-red-100 hover:to-red-200 hover:-translate-y-0.5 hover:shadow-[4px_4px_0_#000] active:translate-y-0 active:shadow-[2px_2px_0_#000] transition-all duration-150"
             >
               <FileText size={18} className="text-red-600" />
               <span>PDF to JPG</span>
-            </Link>
+            </Link> */}
           </div>
 
           {/* Right: Auth */}
