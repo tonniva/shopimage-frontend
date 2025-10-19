@@ -60,7 +60,7 @@ export default function ConvertWebPOnMobileEN() {
           <h2 className="text-3xl font-bold mb-6">Why Convert WebP on Mobile?</h2>
           <div className="prose prose-lg max-w-none text-gray-700 leading-relaxed space-y-4">
             <p>
-              Many online sellers primarily use mobile phones. They don't have computers or may be away from home needing quick image conversions. Being able to <strong>convert to WebP via mobile without downloading apps</strong> is incredibly convenient!
+              Many online sellers primarily use mobile phones. They don&rsquo;t have computers or may be away from home needing quick image conversions. Being able to <strong>convert to WebP via mobile without downloading apps</strong> is incredibly convenient!
             </p>
             <ul className="space-y-2 ml-6">
               <li className="flex items-start gap-2">
@@ -122,7 +122,7 @@ export default function ConvertWebPOnMobileEN() {
                 <div className="flex-1">
                   <h3 className="font-bold text-xl mb-2">Select Images from Phone</h3>
                   <p className="text-gray-700 mb-3">
-                    Tap "Choose File" or "Upload" and select images from:
+                    Tap &ldquo;Choose File&rdquo; or &ldquo;Upload&rdquo; and select images from:
                   </p>
                   <ul className="space-y-2 ml-4 text-gray-700">
                     <li>📸 Recently taken photos (Camera)</li>
@@ -164,7 +164,7 @@ export default function ConvertWebPOnMobileEN() {
                 <div className="flex-1">
                   <h3 className="font-bold text-xl mb-2">Convert and Download</h3>
                   <p className="text-gray-700 mb-3">
-                    Tap <strong>"Convert"</strong> button, wait a moment (less than 10 seconds), then tap <strong>"Download"</strong> to save to your phone
+                    Tap <strong>&ldquo;Convert&rdquo;</strong> button, wait a moment (less than 10 seconds), then tap <strong>&ldquo;Download&rdquo;</strong> to save to your phone
                   </p>
                   <div className="p-3 bg-blue-50 rounded-lg border border-blue-300 text-sm">
                     📱 Images will be saved to your gallery or downloads folder
@@ -211,7 +211,7 @@ export default function ConvertWebPOnMobileEN() {
                 </li>
               </ul>
               <div className="mt-4 p-3 bg-blue-50 rounded-lg text-sm text-gray-600">
-                <strong>Tip:</strong> Add to home screen like an app using "Add to Home Screen"
+                <strong>Tip:</strong> Add to home screen like an app using &ldquo;Add to Home Screen&rdquo;
               </div>
             </div>
 
@@ -236,7 +236,7 @@ export default function ConvertWebPOnMobileEN() {
                 </li>
               </ul>
               <div className="mt-4 p-3 bg-green-50 rounded-lg text-sm text-gray-600">
-                <strong>Tip:</strong> In Chrome, "Add to Home screen" for quick access
+                <strong>Tip:</strong> In Chrome, &ldquo;Add to Home screen&rdquo; for quick access
               </div>
             </div>
           </div>
@@ -289,7 +289,7 @@ export default function ConvertWebPOnMobileEN() {
             <div className="pb-4">
               <h3 className="font-bold text-lg mb-2">Works with slow internet?</h3>
               <p className="text-gray-700">
-                Yes. Once the webpage loads, processing happens on your phone. Doesn't require much data.
+                Yes. Once the webpage loads, processing happens on your phone. Doesn&rsquo;t require much data.
               </p>
             </div>
           </div>

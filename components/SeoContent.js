@@ -104,7 +104,7 @@ export default function SeoContent({ lang = "th" }) {
 
           <div className="bg-green-50 border-2 border-black p-6 rounded-lg mt-6">
             <h3 className="text-xl font-bold mb-4">
-              🌟 WebP Format - Why It's Better?
+              🌟 WebP Format - Why It&rsquo;s Better?
             </h3>
             <p className="text-gray-700 leading-relaxed mb-4">
               <strong>WebP</strong> is a modern image format developed by Google that provides superior compression compared to traditional JPEG and PNG formats. When you convert your product images to WebP:
@@ -162,7 +162,7 @@ export default function SeoContent({ lang = "th" }) {
               🎁 Perfect For Online Sellers
             </h3>
             <p className="text-gray-700 leading-relaxed">
-              Whether you're a small business owner, dropshipper, or large e-commerce store, our image compression tool helps you:
+              Whether you&rsquo;re a small business owner, dropshipper, or large e-commerce store, our image compression tool helps you:
             </p>
             <ul className="mt-4 space-y-2 text-gray-700">
               <li>💰 <strong>Save Time</strong> - Batch process hundreds of images quickly</li>

@@ -62,11 +62,11 @@ export default function HowToReduceImageSizeEN() {
             <ul className="space-y-2 ml-6">
               <li className="flex items-start gap-2">
                 <CheckCircle className="text-green-500 flex-shrink-0 mt-1" size={20} />
-                <span><strong>Faster Page Loading</strong> - Customers don't have to wait, reducing bounce rates</span>
+                <span><strong>Faster Page Loading</strong> - Customers don&rsquo;t have to wait, reducing bounce rates</span>
               </li>
               <li className="flex items-start gap-2">
                 <CheckCircle className="text-green-500 flex-shrink-0 mt-1" size={20} />
-                <span><strong>Save Customer's Data</strong> - Smaller files use less bandwidth, customers appreciate this</span>
+                <span><strong>Save Customer&rsquo;s Data</strong> - Smaller files use less bandwidth, customers appreciate this</span>
               </li>
               <li className="flex items-start gap-2">
                 <CheckCircle className="text-green-500 flex-shrink-0 mt-1" size={20} />
@@ -212,7 +212,7 @@ export default function HowToReduceImageSizeEN() {
           
           <div className="bg-white rounded-lg p-6 border border-orange-300">
             <p className="text-gray-700 mb-4">
-              You don't need oversized images. Adjust to fit your platform requirements
+              You don&rsquo;t need oversized images. Adjust to fit your platform requirements
             </p>
 
             <div className="space-y-4">
@@ -244,7 +244,7 @@ export default function HowToReduceImageSizeEN() {
             <div className="mt-4 p-4 bg-yellow-50 border-2 border-yellow-400 rounded-lg">
               <p className="text-sm font-bold text-yellow-900">⚠️ Warning:</p>
               <p className="text-sm text-gray-700 mt-1">
-                Don't use images that are too small as they'll appear blurry. Stick to recommended sizes above.
+                Don&rsquo;t use images that are too small as they&rsquo;ll appear blurry. Stick to recommended sizes above.
               </p>
             </div>
           </div>
@@ -261,7 +261,7 @@ export default function HowToReduceImageSizeEN() {
             <div className="bg-white rounded-lg p-5 border border-green-300">
               <h4 className="font-bold text-lg mb-2">🎯 Set Quality/Compression</h4>
               <p className="text-gray-700 text-sm">
-                Recommended quality: <strong>80-85%</strong> - You'll get sharp images while significantly reducing file size
+                Recommended quality: <strong>80-85%</strong> - You&rsquo;ll get sharp images while significantly reducing file size
               </p>
             </div>
 
@@ -314,7 +314,7 @@ export default function HowToReduceImageSizeEN() {
             <div className="border-b border-gray-200 pb-4">
               <h3 className="font-bold text-lg mb-2">Will images lose quality after compression?</h3>
               <p className="text-gray-700">
-                With proper tools and settings, images won't lose visible quality! Use WebP format and 80-85% quality for sharp images with small file sizes.
+                With proper tools and settings, images won&rsquo;t lose visible quality! Use WebP format and 80-85% quality for sharp images with small file sizes.
               </p>
             </div>
 
