@@ -70,6 +70,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="th">
       <head>
+        <meta name='impact-site-verification' value='390615bf-59e3-43eb-ab39-385172758237'></meta>
         {/* ✅ Google Analytics */}
         {GA_ID && (
           <>
