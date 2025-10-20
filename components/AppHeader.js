@@ -2,18 +2,58 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { AuthHeader } from "@/components/AuthHeader";
 import { ImageIcon, FileText, QrCode, Image as ImageIconLucide } from "lucide-react";
 
 // Professional UX/UI optimized header
 export default function AppHeader() {
   const [isMounted, setIsMounted] = useState(false);
+  const [displayText, setDisplayText] = useState("");
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const pathname = usePathname();
   const LOGO = "/logo.png";
   const BMAC_URL = "https://www.buymeacoffee.com/mulufabo";
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  // Typewriter Effect
+  useEffect(() => {
+    if (!isMounted || !pathname) return;
+    
+    const isEN = pathname.startsWith('/en');
+    let fullText = '';
+    
+    if (pathname === '/' || pathname === '/en') {
+      fullText = isEN ? 'Convert Images to WebP Format' : 'แปลงรูปเป็น WebP อัตโนมัติ';
+    } else if (pathname.includes('/pdf-converter')) {
+      fullText = isEN ? 'Convert PDF to JPG Images' : 'แปลง PDF เป็นรูป JPG';
+    } else if (pathname.includes('/add-qr-to-image')) {
+      fullText = isEN ? 'Add QR Code to Your Images' : 'เพิ่ม QR Code ลงรูปภาพ';
+    } else if (pathname.includes('/add-logo-to-image')) {
+      fullText = isEN ? 'Add Logo Watermark to Images' : 'เพิ่ม Logo ลงรูปภาพ';
+    } else {
+      fullText = isEN ? 'Image Tools & Converter' : 'เครื่องมือแปลงและแก้ไขรูปภาพ';
+    }
+    
+    setDisplayText("");
+    setCurrentIndex(0);
+
+    const timer = setInterval(() => {
+      setCurrentIndex((prevIndex) => {
+        if (prevIndex >= fullText.length) {
+          clearInterval(timer);
+          return prevIndex;
+        }
+        setDisplayText(fullText.substring(0, prevIndex + 1));
+        return prevIndex + 1;
+      });
+    }, 50); // ความเร็วในการพิมพ์
+
+    return () => clearInterval(timer);
+  }, [pathname, isMounted]);
 
   if (!isMounted) {
     // Return a simplified version for SSR
@@ -70,6 +110,16 @@ export default function AppHeader() {
             
             <div className="flex-shrink-0">
               <AuthHeader />
+            </div>
+          </div>
+
+          {/* Typewriter Text - Mobile */}
+          <div className="px-4 py-2 bg-gradient-to-r from-purple-50 to-pink-50 border-b border-gray-100">
+            <div className="text-center">
+              <p className="text-xs font-semibold text-purple-700 min-h-[16px]">
+                {displayText}
+                <span className="inline-block w-0.5 h-3 bg-purple-600 ml-0.5 animate-pulse"></span>
+              </p>
             </div>
           </div>
 
@@ -132,6 +182,16 @@ export default function AppHeader() {
             {/* Right: Auth */}
             <div className="flex-shrink-0">
               <AuthHeader />
+            </div>
+          </div>
+
+          {/* Typewriter Text */}
+          <div className="px-6 lg:px-8 py-2 bg-gradient-to-r from-purple-50 to-pink-50 border-b border-gray-100">
+            <div className="text-center">
+              <p className="text-sm font-semibold text-purple-700 min-h-[20px]">
+                {displayText}
+                <span className="inline-block w-0.5 h-4 bg-purple-600 ml-1 animate-pulse"></span>
+              </p>
             </div>
           </div>
 

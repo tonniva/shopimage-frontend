@@ -129,7 +129,7 @@ export default function PdfConverterPage() {
         "px-4 py-3 text-left border border-black rounded-lg transition-all duration-150",
         "hover:-translate-y-0.5 hover:shadow-[3px_3px_0_#000]",
         activeTab === mode
-          ? "bg-black text-white shadow-[3px_3px_0_#000]"
+          ? "bg-gradient-to-r from-purple-600 to-pink-600 shadow-[3px_3px_0_#000] text-white"
           : "bg-white text-black",
       ].join(" ")}
     >
