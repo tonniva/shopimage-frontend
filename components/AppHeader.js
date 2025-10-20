@@ -21,18 +21,18 @@ export default function AppHeader() {
 
   // Typewriter Effect
   useEffect(() => {
-    if (!isMounted) return;
+    if (!isMounted || !pathname) return;
     
-    const isEN = pathname?.startsWith('/en');
+    const isEN = pathname.startsWith('/en');
     let fullText = '';
     
     if (pathname === '/' || pathname === '/en') {
       fullText = isEN ? 'Convert Images to WebP Format' : 'แปลงรูปเป็น WebP อัตโนมัติ';
-    } else if (pathname?.includes('/pdf-converter')) {
+    } else if (pathname.includes('/pdf-converter')) {
       fullText = isEN ? 'Convert PDF to JPG Images' : 'แปลง PDF เป็นรูป JPG';
-    } else if (pathname?.includes('/add-qr-to-image')) {
+    } else if (pathname.includes('/add-qr-to-image')) {
       fullText = isEN ? 'Add QR Code to Your Images' : 'เพิ่ม QR Code ลงรูปภาพ';
-    } else if (pathname?.includes('/add-logo-to-image')) {
+    } else if (pathname.includes('/add-logo-to-image')) {
       fullText = isEN ? 'Add Logo Watermark to Images' : 'เพิ่ม Logo ลงรูปภาพ';
     } else {
       fullText = isEN ? 'Image Tools & Converter' : 'เครื่องมือแปลงและแก้ไขรูปภาพ';
