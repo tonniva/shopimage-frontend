@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /api/
 
-Sitemap: https://ย่อรูป.com/sitemap.xml
+Sitemap: https://www.xn--s3cnd3b9cte.com/sitemap.xml

@@ -230,12 +230,7 @@ export default function FacebookImageGuide() {
         </div>
       </article>
 
-      <footer className="border-t-2 border-black bg-white py-8">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <Link href="/" className="text-2xl font-bold text-blue-600 hover:text-blue-700 mb-2 block">ย่อรูป.com</Link>
-          <p className="text-gray-500 text-xs mt-4">© 2025 ย่อรูป.com</p>
-        </div>
-      </footer>
+     
     </div>
   );
 }

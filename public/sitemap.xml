@@ -3,121 +3,121 @@
   xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
-  <!-- หน้าแรก ภาษาไทย -->
+  <!-- Home (TH / EN) -->
   <url>
-    <loc>https://ย่อรูป.com/</loc>
-    <xhtml:link rel="alternate" hreflang="th" href="https://ย่อรูป.com/" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://ย่อรูป.com/en" />
-    <lastmod>2025-01-01</lastmod>
+    <loc>https://www.xn--s3cnd3b9cte.com/</loc>
+    <xhtml:link rel="alternate" hreflang="th" href="https://www.xn--s3cnd3b9cte.com/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.xn--s3cnd3b9cte.com/en/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.xn--s3cnd3b9cte.com/" />
+    <lastmod>2025-01-19</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
-
-  <!-- หน้าแรก ภาษาอังกฤษ -->
   <url>
-    <loc>https://ย่อรูป.com/en</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://ย่อรูป.com/en" />
-    <xhtml:link rel="alternate" hreflang="th" href="https://ย่อรูป.com/" />
-    <lastmod>2025-01-01</lastmod>
+    <loc>https://www.xn--s3cnd3b9cte.com/en/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.xn--s3cnd3b9cte.com/en/" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://www.xn--s3cnd3b9cte.com/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.xn--s3cnd3b9cte.com/" />
+    <lastmod>2025-01-19</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
 
-  <!-- How to Reduce Image Size - ภาษาไทย -->
+  <!-- วิธีลดขนาดรูปให้ไม่แตก -->
   <url>
-    <loc>https://ย่อรูป.com/how-to-reduce-image-size</loc>
-    <xhtml:link rel="alternate" hreflang="th" href="https://ย่อรูป.com/how-to-reduce-image-size" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://ย่อรูป.com/en/how-to-reduce-image-size" />
+    <loc>https://www.xn--s3cnd3b9cte.com/how-to-reduce-image-size/</loc>
+    <xhtml:link rel="alternate" hreflang="th" href="https://www.xn--s3cnd3b9cte.com/how-to-reduce-image-size/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.xn--s3cnd3b9cte.com/en/how-to-reduce-image-size/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.xn--s3cnd3b9cte.com/how-to-reduce-image-size/" />
+    <lastmod>2025-01-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.xn--s3cnd3b9cte.com/en/how-to-reduce-image-size/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.xn--s3cnd3b9cte.com/en/how-to-reduce-image-size/" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://www.xn--s3cnd3b9cte.com/how-to-reduce-image-size/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.xn--s3cnd3b9cte.com/how-to-reduce-image-size/" />
     <lastmod>2025-01-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
-  <!-- How to Reduce Image Size - English -->
+  <!-- แปลงรูป WebP บนมือถือ -->
   <url>
-    <loc>https://ย่อรูป.com/en/how-to-reduce-image-size</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://ย่อรูป.com/en/how-to-reduce-image-size" />
-    <xhtml:link rel="alternate" hreflang="th" href="https://ย่อรูป.com/how-to-reduce-image-size" />
+    <loc>https://www.xn--s3cnd3b9cte.com/convert-webp-on-mobile/</loc>
+    <xhtml:link rel="alternate" hreflang="th" href="https://www.xn--s3cnd3b9cte.com/convert-webp-on-mobile/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.xn--s3cnd3b9cte.com/en/convert-webp-on-mobile/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.xn--s3cnd3b9cte.com/convert-webp-on-mobile/" />
+    <lastmod>2025-01-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.xn--s3cnd3b9cte.com/en/convert-webp-on-mobile/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.xn--s3cnd3b9cte.com/en/convert-webp-on-mobile/" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://www.xn--s3cnd3b9cte.com/convert-webp-on-mobile/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.xn--s3cnd3b9cte.com/convert-webp-on-mobile/" />
     <lastmod>2025-01-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
-  <!-- Convert WebP on Mobile - ภาษาไทย -->
+  <!-- WebP vs JPG -->
   <url>
-    <loc>https://ย่อรูป.com/convert-webp-on-mobile</loc>
-    <xhtml:link rel="alternate" hreflang="th" href="https://ย่อรูป.com/convert-webp-on-mobile" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://ย่อรูป.com/en/convert-webp-on-mobile" />
+    <loc>https://www.xn--s3cnd3b9cte.com/webp-vs-jpg/</loc>
+    <xhtml:link rel="alternate" hreflang="th" href="https://www.xn--s3cnd3b9cte.com/webp-vs-jpg/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.xn--s3cnd3b9cte.com/en/webp-vs-jpg/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.xn--s3cnd3b9cte.com/webp-vs-jpg/" />
+    <lastmod>2025-01-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.xn--s3cnd3b9cte.com/en/webp-vs-jpg/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.xn--s3cnd3b9cte.com/en/webp-vs-jpg/" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://www.xn--s3cnd3b9cte.com/webp-vs-jpg/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.xn--s3cnd3b9cte.com/webp-vs-jpg/" />
     <lastmod>2025-01-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
-  <!-- Convert WebP on Mobile - English -->
+  <!-- ขนาดภาพ Shopee -->
   <url>
-    <loc>https://ย่อรูป.com/en/convert-webp-on-mobile</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://ย่อรูป.com/en/convert-webp-on-mobile" />
-    <xhtml:link rel="alternate" hreflang="th" href="https://ย่อรูป.com/convert-webp-on-mobile" />
+    <loc>https://www.xn--s3cnd3b9cte.com/shopee-image-size/</loc>
+    <xhtml:link rel="alternate" hreflang="th" href="https://www.xn--s3cnd3b9cte.com/shopee-image-size/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.xn--s3cnd3b9cte.com/en/shopee-image-size/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.xn--s3cnd3b9cte.com/shopee-image-size/" />
+    <lastmod>2025-01-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.xn--s3cnd3b9cte.com/en/shopee-image-size/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.xn--s3cnd3b9cte.com/en/shopee-image-size/" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://www.xn--s3cnd3b9cte.com/shopee-image-size/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.xn--s3cnd3b9cte.com/shopee-image-size/" />
     <lastmod>2025-01-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
-  <!-- WebP vs JPG - ภาษาไทย -->
+  <!-- Facebook Image Guide -->
   <url>
-    <loc>https://ย่อรูป.com/webp-vs-jpg</loc>
-    <xhtml:link rel="alternate" hreflang="th" href="https://ย่อรูป.com/webp-vs-jpg" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://ย่อรูป.com/en/webp-vs-jpg" />
+    <loc>https://www.xn--s3cnd3b9cte.com/facebook-image-guide/</loc>
+    <xhtml:link rel="alternate" hreflang="th" href="https://www.xn--s3cnd3b9cte.com/facebook-image-guide/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.xn--s3cnd3b9cte.com/en/facebook-image-guide/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.xn--s3cnd3b9cte.com/facebook-image-guide/" />
     <lastmod>2025-01-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
-
-  <!-- WebP vs JPG - English -->
   <url>
-    <loc>https://ย่อรูป.com/en/webp-vs-jpg</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://ย่อรูป.com/en/webp-vs-jpg" />
-    <xhtml:link rel="alternate" hreflang="th" href="https://ย่อรูป.com/webp-vs-jpg" />
-    <lastmod>2025-01-19</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <!-- Shopee Image Size - ภาษาไทย -->
-  <url>
-    <loc>https://ย่อรูป.com/shopee-image-size</loc>
-    <xhtml:link rel="alternate" hreflang="th" href="https://ย่อรูป.com/shopee-image-size" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://ย่อรูป.com/en/shopee-image-size" />
-    <lastmod>2025-01-19</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <!-- Shopee Image Size - English -->
-  <url>
-    <loc>https://ย่อรูป.com/en/shopee-image-size</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://ย่อรูป.com/en/shopee-image-size" />
-    <xhtml:link rel="alternate" hreflang="th" href="https://ย่อรูป.com/shopee-image-size" />
-    <lastmod>2025-01-19</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <!-- Facebook Image Guide - ภาษาไทย -->
-  <url>
-    <loc>https://ย่อรูป.com/facebook-image-guide</loc>
-    <xhtml:link rel="alternate" hreflang="th" href="https://ย่อรูป.com/facebook-image-guide" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://ย่อรูป.com/en/facebook-image-guide" />
-    <lastmod>2025-01-19</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <!-- Facebook Image Guide - English -->
-  <url>
-    <loc>https://ย่อรูป.com/en/facebook-image-guide</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://ย่อรูป.com/en/facebook-image-guide" />
-    <xhtml:link rel="alternate" hreflang="th" href="https://ย่อรูป.com/facebook-image-guide" />
+    <loc>https://www.xn--s3cnd3b9cte.com/en/facebook-image-guide/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.xn--s3cnd3b9cte.com/en/facebook-image-guide/" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://www.xn--s3cnd3b9cte.com/facebook-image-guide/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.xn--s3cnd3b9cte.com/facebook-image-guide/" />
     <lastmod>2025-01-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>

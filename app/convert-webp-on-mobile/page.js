@@ -399,19 +399,7 @@ export default function ConvertWebPOnMobile() {
       </article>
 
       {/* Footer */}
-      <footer className="border-t-2 border-black bg-white py-8 mt-12">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <Link href="/" className="text-2xl font-bold text-purple-600 hover:text-purple-700 mb-2 block">
-            ย่อรูป.com
-          </Link>
-          <p className="text-gray-600 text-sm">
-            แปลงรูป WebP บนมือถือ • ไม่ต้องลงแอพ • ใช้ฟรี
-          </p>
-          <p className="text-gray-500 text-xs mt-4">
-            © 2025 ย่อรูป.com - All rights reserved
-          </p>
-        </div>
-      </footer>
+      
     </div>
   );
 }
