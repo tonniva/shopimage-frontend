@@ -366,20 +366,7 @@ export default function HowToReduceImageSize() {
 
       </article>
 
-      {/* Footer */}
-      <footer className="border-t-2 border-black bg-white py-8 mt-12">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <Link href="/" className="text-2xl font-bold text-blue-600 hover:text-blue-700 mb-2 block">
-            ย่อรูป.com
-          </Link>
-          <p className="text-gray-600 text-sm">
-            เครื่องมือย่อรูปภาพออนไลน์ฟรี • ใช้งานง่าย • ไม่มีลายน้ำ
-          </p>
-          <p className="text-gray-500 text-xs mt-4">
-            © 2025 ย่อรูป.com - All rights reserved
-          </p>
-        </div>
-      </footer>
+      {/* Footer */} 
     </div>
   );
 }
