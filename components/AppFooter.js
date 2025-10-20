@@ -8,27 +8,27 @@ export default function AppFooter() {
 
   return (
     <footer className="mt-12 border-t-2 border-black bg-white">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 bg-gradient-to-r from-purple-600 to-pink-600">
         <div className="grid md:grid-cols-2 gap-8 items-start">
           {/* Left Side: Info & Messages */}
           <div className="space-y-4">
-            <div className="text-sm text-gray-600 leading-relaxed">
+            <div className="text-sm text-white leading-relaxed">
               <p className="font-bold text-xl text-gray-900 mb-3">
                 Every donation = cat food 🐱❤️
               </p>
-              <p className="font-medium text-gray-900 mb-2">
+              <p className="font-medium text-white mb-2">
                 Your support means food and love for my cats ❤️🐱
               </p>
-              <p className="text-xs text-gray-600">
+              <p className="text-xs text-white">
                 100% of all support is used for cat food only.
               </p>
-              <div className="text-xs text-gray-500 mt-2">
+              <div className="text-xs text-white mt-2">
                 👉 *Files auto deleted after midnight 🔥
               </div>
             </div>
 
             <div className="pt-4 border-t border-gray-200">
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-white">
                 © {new Date().getFullYear()} To Webp — All rights reserved.
               </p>
             </div>
@@ -63,7 +63,7 @@ export default function AppFooter() {
               </div>
               <div className="text-center mt-3">
                 <div className="text-base font-bold text-gray-900">Support 🐱❤️</div>
-                <div className="text-sm text-gray-600">Scan to donate</div>
+                <div className="text-sm text-white">Scan to donate</div>
               </div>
             </Link>
           </div>

@@ -5,9 +5,9 @@ import AppFooter from "@/components/AppFooter";
 
 export default function LayoutContent({ children }) {
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-6xl mx-auto sm:px-6 lg:px-8">
       <AppHeader />
-      <main className="pt-6 md:pt-8">{children}</main>
+      <main>{children}</main>
       <AppFooter />
     </div>
   );
