@@ -174,6 +174,43 @@ body {
 }
 
 
-input::-webkit-input-placeholder {
-  font-size: 8px; 
+/* Placeholder styles for all inputs - make them more readable */
+input::placeholder,
+textarea::placeholder {
+  font-size: 14px;
+  opacity: 0.6;
+}
+
+input::-webkit-input-placeholder,
+textarea::-webkit-input-placeholder {
+  font-size: 14px;
+  opacity: 0.6;
+}
+
+input::-moz-placeholder,
+textarea::-moz-placeholder {
+  font-size: 14px;
+  opacity: 0.6;
+}
+
+input:-ms-input-placeholder,
+textarea:-ms-input-placeholder {
+  font-size: 14px;
+  opacity: 0.6;
+}
+
+/* Emoji picker animation */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slideDown {
+  animation: slideDown 0.2s ease-out;
 }

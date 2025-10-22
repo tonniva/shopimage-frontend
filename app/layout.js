@@ -3,6 +3,13 @@ import { Toaster } from "sonner";
 import AuthProvider from "@/components/AuthProvider";
 import LayoutContent from "@/components/LayoutContent";
 import Script from "next/script";
+import { Kanit } from "next/font/google";
+
+const kanit = Kanit({
+  weight: ['200', '300', '400', '500', '600', '700', '800'],
+  subsets: ['thai', 'latin'],
+  display: 'swap',
+});
 
 // ✅ SEO Metadata
 export const metadata = {
@@ -88,7 +95,7 @@ export default function RootLayout({ children }) {
           </>
         )}
       </head>
-      <body className="antialiased">
+      <body className={`${kanit.className} antialiased`}>
         <AuthProvider>
           <LayoutContent>{children}</LayoutContent>
           <Toaster richColors position="top-right" />

@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { AuthHeader } from "@/components/AuthHeader";
-import { ImageIcon, FileText, QrCode, Image as ImageIconLucide } from "lucide-react";
+import { ImageIcon, FileText, QrCode, Image as ImageIconLucide, Film, Layers, PawPrint, Bed, Magnet, Scissors } from "lucide-react";
 
 // Professional UX/UI optimized header
 export default function AppHeader() {
@@ -34,6 +34,18 @@ export default function AppHeader() {
       fullText = isEN ? 'Add QR Code to Your Images' : 'เพิ่ม QR Code ลงรูปภาพ';
     } else if (pathname.includes('/add-logo-to-image')) {
       fullText = isEN ? 'Add Logo Watermark to Images' : 'เพิ่ม Logo ลงรูปภาพ';
+    } else if (pathname.includes('/gif-maker')) {
+      fullText = isEN ? 'Create Animated GIF from Images' : 'สร้าง GIF เคลื่อนไหวจากรูปภาพ';
+    } else if (pathname.includes('/pdf-merger')) {
+      fullText = isEN ? 'Merge Multiple PDFs into One' : 'รวมไฟล์ PDF หลายไฟล์เป็นไฟล์เดียว';
+    } else if (pathname.includes('/pet-tag-maker')) {
+      fullText = isEN ? 'Create QR Pet Tags for Your Pets' : 'ทำป้ายชื่อสัตว์เลี้ยงพร้อม QR Code';
+    } else if (pathname.includes('/pet-to-pillow')) {
+      fullText = isEN ? 'Create Custom Pet Pillows' : 'สร้างหมอนรูปสัตว์เลี้ยง';
+    } else if (pathname.includes('/mica-magnetic-photos')) {
+      fullText = isEN ? 'Create Mica Magnetic Photos' : 'สร้างภาพถ่ายด้วยไมก้าแม่เหล็ก';
+    } else if (pathname.includes('/remove-background')) {
+      fullText = isEN ? 'Remove Image Backgrounds with AI' : 'ลบพื้นหลังอัตโนมัติด้วย AI';
     } else {
       fullText = isEN ? 'Image Tools & Converter' : 'เครื่องมือแปลงและแก้ไขรูปภาพ';
     }
@@ -116,7 +128,7 @@ export default function AppHeader() {
           {/* Typewriter Text - Mobile */}
           <div className="px-4 py-2 bg-gradient-to-r from-purple-50 to-pink-50 border-b border-gray-100">
             <div className="text-center">
-              <p className="text-xs font-semibold text-purple-700 min-h-[16px]">
+              <p className="text-lg font-semibold text-purple-700 min-h-[16px]">
                 {displayText}
                 <span className="inline-block w-0.5 h-3 bg-purple-600 ml-0.5 animate-pulse"></span>
               </p>
@@ -156,6 +168,53 @@ export default function AppHeader() {
               >
                 <ImageIconLucide size={16} className="text-green-600" />
                 <span>Add Logo</span>
+              </Link>
+
+              <Link
+                href="/gif-maker"
+                className="flex items-center justify-center gap-2 px-3 py-3 rounded-lg text-xs font-semibold border-2 border-black bg-gradient-to-br from-orange-50 to-orange-100 hover:from-orange-100 hover:to-orange-200 active:scale-95 transition-all duration-150 shadow-sm"
+              >
+                <Film size={16} className="text-orange-600" />
+                <span>GIF Maker</span>
+              </Link>
+
+              <Link
+                href="/pdf-merger"
+                className="flex items-center justify-center gap-2 px-3 py-3 rounded-lg text-xs font-semibold border-2 border-black bg-gradient-to-br from-yellow-50 to-yellow-100 hover:from-yellow-100 hover:to-yellow-200 active:scale-95 transition-all duration-150 shadow-sm"
+              >
+                <Layers size={16} className="text-yellow-700" />
+                <span>PDF Merge</span>
+              </Link>
+
+              <Link
+                href="/pet-tag-maker"
+                className="flex items-center justify-center gap-2 px-3 py-3 rounded-lg text-xs font-semibold border-2 border-black bg-gradient-to-br from-pink-50 to-rose-100 hover:from-pink-100 hover:to-rose-200 active:scale-95 transition-all duration-150 shadow-sm"
+              >
+                <PawPrint size={16} className="text-pink-600" />
+                <span>Pet Tag</span>
+              </Link>
+              {/* <Link
+                href="/pet-to-pillow"
+                className="flex items-center justify-center gap-2 px-3 py-3 rounded-lg text-xs font-semibold border-2 border-black bg-gradient-to-br from-indigo-50 to-indigo-100 hover:from-indigo-100 hover:to-indigo-200 active:scale-95 transition-all duration-150 shadow-sm"
+              >
+                <Bed size={16} className="text-indigo-600" />
+                <span>Pet Pillow</span>
+              </Link> */}
+
+              <Link
+                href="/mica-magnetic-photos"
+                className="flex items-center justify-center gap-2 px-3 py-3 rounded-lg text-xs font-semibold border-2 border-black bg-gradient-to-br from-teal-50 to-teal-100 hover:from-teal-100 hover:to-teal-200 active:scale-95 transition-all duration-150 shadow-sm"
+              >
+                <Magnet size={16} className="text-teal-600" />
+                <span>Mica Photos</span>
+              </Link>
+
+              <Link
+                href="/remove-background"
+                className="flex items-center justify-center gap-2 px-3 py-3 rounded-lg text-xs font-semibold border-2 border-black bg-gradient-to-br from-cyan-50 to-cyan-100 hover:from-cyan-100 hover:to-cyan-200 active:scale-95 transition-all duration-150 shadow-sm"
+              >
+                <Scissors size={16} className="text-cyan-600" />
+                <span>Remove BG</span>
               </Link>
             </div>
           </div>
@@ -197,37 +256,84 @@ export default function AppHeader() {
 
           {/* Navigation Menu */}
           <div className="px-6 lg:px-8 py-3 bg-gradient-to-r from-gray-50 to-white">
-            <div className="flex items-center justify-center gap-3">
+            <div className="flex items-center justify-center flex-wrap gap-2">
               <Link
                 href="/"
-                className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold border-2 border-black bg-gradient-to-br from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 hover:-translate-y-0.5 hover:shadow-[4px_4px_0_#000] active:translate-y-0 active:shadow-[2px_2px_0_#000] transition-all duration-150"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold border-2 border-black bg-gradient-to-br from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 hover:-translate-y-0.5 hover:shadow-[3px_3px_0_#000] active:translate-y-0 active:shadow-[1px_1px_0_#000] transition-all duration-150"
               >
-                <ImageIcon size={18} className="text-blue-600" />
+                <ImageIcon size={16} className="text-blue-600" />
                 <span>IMG to WEBP</span>
               </Link>
 
               <Link
                 href="/pdf-converter"
-                className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold border-2 border-black bg-gradient-to-br from-red-50 to-red-100 hover:from-red-100 hover:to-red-200 hover:-translate-y-0.5 hover:shadow-[4px_4px_0_#000] active:translate-y-0 active:shadow-[2px_2px_0_#000] transition-all duration-150"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold border-2 border-black bg-gradient-to-br from-red-50 to-red-100 hover:from-red-100 hover:to-red-200 hover:-translate-y-0.5 hover:shadow-[3px_3px_0_#000] active:translate-y-0 active:shadow-[1px_1px_0_#000] transition-all duration-150"
               >
-                <FileText size={18} className="text-red-600" />
+                <FileText size={16} className="text-red-600" />
                 <span>PDF to JPG</span>
               </Link>
 
               <Link
                 href="/add-qr-to-image"
-                className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold border-2 border-black bg-gradient-to-br from-purple-50 to-purple-100 hover:from-purple-100 hover:to-purple-200 hover:-translate-y-0.5 hover:shadow-[4px_4px_0_#000] active:translate-y-0 active:shadow-[2px_2px_0_#000] transition-all duration-150"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold border-2 border-black bg-gradient-to-br from-purple-50 to-purple-100 hover:from-purple-100 hover:to-purple-200 hover:-translate-y-0.5 hover:shadow-[3px_3px_0_#000] active:translate-y-0 active:shadow-[1px_1px_0_#000] transition-all duration-150"
               >
-                <QrCode size={18} className="text-purple-600" />
+                <QrCode size={16} className="text-purple-600" />
                 <span>Add QR</span>
               </Link>
 
               <Link
                 href="/add-logo-to-image"
-                className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold border-2 border-black bg-gradient-to-br from-green-50 to-green-100 hover:from-green-100 hover:to-green-200 hover:-translate-y-0.5 hover:shadow-[4px_4px_0_#000] active:translate-y-0 active:shadow-[2px_2px_0_#000] transition-all duration-150"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold border-2 border-black bg-gradient-to-br from-green-50 to-green-100 hover:from-green-100 hover:to-green-200 hover:-translate-y-0.5 hover:shadow-[3px_3px_0_#000] active:translate-y-0 active:shadow-[1px_1px_0_#000] transition-all duration-150"
               >
-                <ImageIconLucide size={18} className="text-green-600" />
+                <ImageIconLucide size={16} className="text-green-600" />
                 <span>Add Logo</span>
+              </Link>
+
+              <Link
+                href="/gif-maker"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold border-2 border-black bg-gradient-to-br from-orange-50 to-orange-100 hover:from-orange-100 hover:to-orange-200 hover:-translate-y-0.5 hover:shadow-[3px_3px_0_#000] active:translate-y-0 active:shadow-[1px_1px_0_#000] transition-all duration-150"
+              >
+                <Film size={16} className="text-orange-600" />
+                <span>GIF Maker</span>
+              </Link>
+
+              <Link
+                href="/pdf-merger"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold border-2 border-black bg-gradient-to-br from-yellow-50 to-yellow-100 hover:from-yellow-100 hover:to-yellow-200 hover:-translate-y-0.5 hover:shadow-[3px_3px_0_#000] active:translate-y-0 active:shadow-[1px_1px_0_#000] transition-all duration-150"
+              >
+                <Layers size={16} className="text-yellow-700" />
+                <span>PDF Merger</span>
+              </Link>
+
+              <Link
+                href="/pet-tag-maker"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold border-2 border-black bg-gradient-to-br from-pink-50 to-rose-100 hover:from-pink-100 hover:to-rose-200 hover:-translate-y-0.5 hover:shadow-[3px_3px_0_#000] active:translate-y-0 active:shadow-[1px_1px_0_#000] transition-all duration-150"
+              >
+                <PawPrint size={16} className="text-pink-600" />
+                <span>Pet Tag</span>
+              </Link>
+              {/* <Link
+                href="/pet-to-pillow"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold border-2 border-black bg-gradient-to-br from-indigo-50 to-indigo-100 hover:from-indigo-100 hover:to-indigo-200 hover:-translate-y-0.5 hover:shadow-[3px_3px_0_#000] active:translate-y-0 active:shadow-[1px_1px_0_#000] transition-all duration-150"
+              >
+                <Bed size={16} className="text-indigo-600" />
+                <span>Pet Pillow</span>
+              </Link> */}
+
+              <Link
+                href="/mica-magnetic-photos"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold border-2 border-black bg-gradient-to-br from-teal-50 to-teal-100 hover:from-teal-100 hover:to-teal-200 hover:-translate-y-0.5 hover:shadow-[3px_3px_0_#000] active:translate-y-0 active:shadow-[1px_1px_0_#000] transition-all duration-150"
+              >
+                <Magnet size={16} className="text-teal-600" />
+                <span>Mica Photos</span>
+              </Link>
+
+              <Link
+                href="/remove-background"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold border-2 border-black bg-gradient-to-br from-cyan-50 to-cyan-100 hover:from-cyan-100 hover:to-cyan-200 hover:-translate-y-0.5 hover:shadow-[3px_3px_0_#000] active:translate-y-0 active:shadow-[1px_1px_0_#000] transition-all duration-150"
+              >
+                <Scissors size={16} className="text-cyan-600" />
+                <span>Remove BG</span>
               </Link>
             </div>
           </div>
