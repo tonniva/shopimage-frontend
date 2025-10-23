@@ -940,32 +940,35 @@ export default function MicaMagneticPhotosPage() {
 
             {/* Download ZIP Button */}
             {processedImages.length > 0 && (
-              <div className="bg-white border-2 border-black rounded-xl p-6">
-                <h3 className="text-xl font-bold mb-4">ดาวน์โหลดฟรี</h3>
+              <div className="bg-white border-2 border-gray-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
+                <h3 className="text-lg font-bold mb-3 flex items-center gap-2 text-gray-800">
+                  <Download size={18} />
+                  ดาวน์โหลดฟรี
+                </h3>
                 
                 <div className="space-y-3">
                   <button
                     onClick={downloadAllImages}
-                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-4 px-6 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-200 flex items-center justify-center gap-2 shadow-lg"
+                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
                   >
-                    <Download size={20} />
+                    <Download size={18} />
                     <span>ดาวน์โหลดทั้งหมด (ZIP)</span>
                   </button>
 
-                  <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-lg border-2 border-purple-200">
+                  <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-4 rounded-lg border-2 border-blue-200">
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
-                        <span className="font-semibold">จำนวนรูป:</span>
-                        <span className="font-bold text-purple-600">{processedImages.length} รูป</span>
+                        <span className="font-semibold text-gray-700">จำนวนรูป:</span>
+                        <span className="font-bold text-blue-600">{processedImages.length} รูป</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="font-semibold">ราคาต่อรูป:</span>
-                        <span className="font-bold">{sizeTemplates.find(t => t.id === selectedSize)?.price}</span>
+                        <span className="font-semibold text-gray-700">ราคาต่อรูป:</span>
+                        <span className="font-bold text-gray-800">{sizeTemplates.find(t => t.id === selectedSize)?.price}</span>
                       </div>
-                      <div className="border-t border-purple-200 pt-2 mt-2">
+                      <div className="border-t border-blue-200 pt-2 mt-2">
                         <div className="flex justify-between text-lg">
-                          <span className="font-bold">รวมทั้งหมด:</span>
-                          <span className="font-bold text-purple-600">{calculateTotalPrice()} บาท</span>
+                          <span className="font-bold text-gray-800">รวมทั้งหมด:</span>
+                          <span className="font-bold text-blue-600">{calculateTotalPrice()} บาท</span>
                         </div>
                       </div>
                     </div>
@@ -975,16 +978,16 @@ export default function MicaMagneticPhotosPage() {
                   <button
                     onClick={proceedToCheckout}
                     disabled={!customerName || !customerEmail || isProceedingToCheckout}
-                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-2.5 px-4 rounded-lg hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 text-sm"
+                    className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold py-3 px-4 rounded-lg hover:from-green-700 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
                   >
                     {isProceedingToCheckout ? (
                       <>
-                        <Loader2 className="animate-spin" size={16} />
+                        <Loader2 className="animate-spin" size={18} />
                         <span>กำลังเตรียมการชำระเงิน...</span>
                       </>
                     ) : (
                       <>
-                        <ShoppingCart size={16} />
+                        <ShoppingCart size={18} />
                         <span>สั่งซื้อและชำระเงิน</span>
                       </>
                     )}
