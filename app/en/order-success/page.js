@@ -207,6 +207,7 @@ function OrderSuccessContent() {
               </div>
             </div>
           )}
+          {order.scene_url && (
             <div className="bg-white border-2 border-black rounded-xl p-6">
               <h3 className="text-xl font-bold mb-4">Your Design</h3>
               <img
