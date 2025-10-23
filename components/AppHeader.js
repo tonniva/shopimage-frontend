@@ -201,13 +201,12 @@ export default function AppHeader() {
                 <span>Pet Pillow</span>
               </Link> */}
 
-              <Link
-                href="/mica-magnetic-photos"
-                className="flex items-center justify-center gap-2 px-3 py-3 rounded-lg text-xs font-semibold border-2 border-black bg-gradient-to-br from-teal-50 to-teal-100 hover:from-teal-100 hover:to-teal-200 active:scale-95 transition-all duration-150 shadow-sm"
+              <div
+                className="flex items-center justify-center gap-2 px-3 py-3 rounded-lg text-xs font-semibold border-2 border-gray-300 bg-gradient-to-br from-gray-100 to-gray-200 cursor-not-allowed opacity-50 transition-all duration-150 shadow-sm"
               >
-                <Magnet size={16} className="text-teal-600" />
-                <span>Mica Photos</span>
-              </Link>
+                <Magnet size={16} className="text-gray-400" />
+                <span className="text-gray-500">Mica Photos</span>
+              </div>
 
               <Link
                 href="/remove-background"
@@ -320,13 +319,12 @@ export default function AppHeader() {
                 <span>Pet Pillow</span>
               </Link> */}
 
-              <Link
-                href="/mica-magnetic-photos"
-                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold border-2 border-black bg-gradient-to-br from-teal-50 to-teal-100 hover:from-teal-100 hover:to-teal-200 hover:-translate-y-0.5 hover:shadow-[3px_3px_0_#000] active:translate-y-0 active:shadow-[1px_1px_0_#000] transition-all duration-150"
+              <div
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold border-2 border-gray-300 bg-gradient-to-br from-gray-100 to-gray-200 cursor-not-allowed opacity-50 transition-all duration-150"
               >
-                <Magnet size={16} className="text-teal-600" />
-                <span>Mica Photos</span>
-              </Link>
+                <Magnet size={16} className="text-gray-400" />
+                <span className="text-gray-500">Mica Photos</span>
+              </div>
 
               <Link
                 href="/remove-background"
