@@ -112,10 +112,18 @@ export default function RemoveBackgroundPage() {
 
   // Download single image
   const downloadSingleImage = (image) => {
+    if (!image.processedUrl) return;
+    
+    // Create a temporary link element
     const link = document.createElement("a");
     link.href = image.processedUrl;
     link.download = `nobg_${image.name}`;
+    link.target = "_blank"; // Fallback for browsers that don't support download
+    
+    // Append to body, click, then remove
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
   };
 
   // Download all as ZIP

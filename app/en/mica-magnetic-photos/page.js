@@ -12,10 +12,14 @@ export default function MicaMagneticPhotosPage() {
   const [selectedSize, setSelectedSize] = useState("type1");
   const [isProcessing, setIsProcessing] = useState(false);
   const [isShowingAll, setIsShowingAll] = useState(false);
-  const [imageZoom, setImageZoom] = useState(25);
+  const [imageZoom, setImageZoom] = useState(5);
   const [imagePositions, setImagePositions] = useState([]); // Array of positions for each image
   const [draggingIndex, setDraggingIndex] = useState(null); // Which image is being dragged
   const previewContainerRef = useRef(null);
+  
+  // ✅ เพิ่ม state สำหรับตัวเลือก AI
+  const [useAIRemoveBG, setUseAIRemoveBG] = useState(false);
+  const [isProcessingImages, setIsProcessingImages] = useState(false);
   
   // Customer info for checkout
   const [customerName, setCustomerName] = useState("");
@@ -131,28 +135,47 @@ export default function MicaMagneticPhotosPage() {
   const processAllImages = async () => {
     if (uploadedImages.length === 0) return;
 
-    setIsProcessing(true);
+    setIsProcessingImages(true);
     const newProcessedImages = [];
 
     for (let i = 0; i < uploadedImages.length; i++) {
       const image = uploadedImages[i];
       try {
-        const processedUrl = await removeBackgroundAPI(image.file);
+        let processedUrl;
+        
+        if (useAIRemoveBG) {
+          // ✅ ใช้ AI remove background
+          processedUrl = await removeBackgroundAPI(image.file);
+        } else {
+          // ✅ ไม่ใช้ AI - ใช้รูปต้นฉบับ
+          processedUrl = image.url;
+        }
+        
         newProcessedImages.push({
           ...image,
           processed: true,
-          processedUrl
+          processedUrl,
+          usedAI: useAIRemoveBG
         });
         
         // Update progress
         setProcessedImages([...newProcessedImages]);
       } catch (error) {
         console.error(`Error processing image ${image.name}:`, error);
+        // Add original image if AI fails
+        newProcessedImages.push({
+          ...image,
+          processed: false,
+          processedUrl: image.url,
+          usedAI: false,
+          error: error.message
+        });
+        setProcessedImages([...newProcessedImages]);
       }
     }
 
     setProcessedImages(newProcessedImages);
-    setIsProcessing(false);
+    setIsProcessingImages(false);
     
     // Auto show all images when processing is complete
     if (newProcessedImages.length > 0) {
@@ -498,19 +521,19 @@ export default function MicaMagneticPhotosPage() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           
           {/* Left Column - Upload & Settings */}
-          <div className="lg:col-span-3 space-y-6">
+          <div className="lg:col-span-4 space-y-4">
             
             {/* Image Upload */}
-            <div className="bg-white border-2 border-black rounded-xl p-6">
-              <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-                <Upload size={20} />
+            <div className="bg-white border-2 border-gray-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
+              <h3 className="text-lg font-bold mb-3 flex items-center gap-2 text-gray-800">
+                <Upload size={18} />
                 Upload Images
               </h3>
               
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <input
                   type="file"
                   multiple
@@ -543,6 +566,79 @@ export default function MicaMagneticPhotosPage() {
                     </div>
                   </div>
                 )}
+              </div>
+            </div>
+
+            {/* ✅ AI Remove Background Option */}
+            <div className="bg-white border-2 border-black rounded-xl p-6">
+              <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                <Sparkles size={20} />
+                Processing Options
+              </h3>
+              
+              <div className="space-y-4">
+                {/* AI Remove Background Toggle */}
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                      useAIRemoveBG ? 'bg-purple-600 border-purple-600' : 'border-gray-300'
+                    }`}>
+                      {useAIRemoveBG && <div className="w-2 h-2 bg-white rounded-full"></div>}
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-900">AI Remove Background</p>
+                      <p className="text-sm text-gray-600">Automatically remove background with AI</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setUseAIRemoveBG(!useAIRemoveBG)}
+                    className={`px-4 py-2 rounded-lg font-semibold transition-all ${
+                      useAIRemoveBG 
+                        ? 'bg-purple-600 text-white' 
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
+                  >
+                    {useAIRemoveBG ? 'ON' : 'OFF'}
+                  </button>
+                </div>
+
+                {/* Processing Button */}
+                {uploadedImages.length > 0 && (
+                  <button
+                    onClick={processAllImages}
+                    disabled={isProcessingImages}
+                    className={`w-full py-3 px-4 rounded-lg font-bold text-white transition-all flex items-center justify-center gap-2 ${
+                      isProcessingImages
+                        ? 'bg-gray-400 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700'
+                    }`}
+                  >
+                    {isProcessingImages ? (
+                      <>
+                        <Loader2 className="animate-spin" size={20} />
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <Zap size={20} />
+                        {useAIRemoveBG ? 'Process with AI' : 'Process Images'}
+                      </>
+                    )}
+                  </button>
+                )}
+
+                {/* Status Info */}
+                <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded-lg">
+                  <p className="font-semibold mb-1">
+                    {useAIRemoveBG ? '🤖 AI Mode' : '📷 Normal Mode'}
+                  </p>
+                  <p>
+                    {useAIRemoveBG 
+                      ? 'Will automatically remove background with AI (takes longer)'
+                      : 'Use original images without background removal (faster)'
+                    }
+                  </p>
+                </div>
               </div>
             </div>
 

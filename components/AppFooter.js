@@ -147,12 +147,9 @@ export default function AppFooter() {
                 100% of all support is used for cat food only.
               </p>
             </div>
-            <div className="text-right">
+            <div className="text-right"> 
               <p className="text-xs opacity-75">
-                👉 *Files auto deleted after midnight 🔥
-              </p>
-              <p className="text-xs opacity-75 mt-2">
-                © {new Date().getFullYear()} To Webp — All rights reserved.
+                © 2024 To Webp — All rights reserved.
               </p>
             </div>
           </div>

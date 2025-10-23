@@ -111,11 +111,34 @@ export default function RemoveBackgroundPage() {
   };
 
   // Download single image
-  const downloadSingleImage = (image) => {
-    const link = document.createElement("a");
-    link.href = image.processedUrl;
-    link.download = `nobg_${image.name}`;
-    link.click();
+  const downloadSingleImage = async (image) => {
+    if (!image.processedUrl) return;
+    
+    try {
+      // Fetch the image as blob first
+      const response = await fetch(image.processedUrl);
+      const blob = await response.blob();
+      
+      // Create object URL from blob
+      const url = URL.createObjectURL(blob);
+      
+      // Create download link
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `nobg_${image.name}`;
+      
+      // Append to body, click, then remove
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Clean up object URL
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Download failed:', error);
+      // Fallback: open in new tab
+      window.open(image.processedUrl, '_blank');
+    }
   };
 
   // Download all as ZIP

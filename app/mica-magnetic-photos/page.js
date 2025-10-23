@@ -17,6 +17,10 @@ export default function MicaMagneticPhotosPage() {
   const [draggingIndex, setDraggingIndex] = useState(null); // Which image is being dragged
   const previewContainerRef = useRef(null);
   
+  // ✅ เพิ่ม state สำหรับตัวเลือก AI
+  const [useAIRemoveBG, setUseAIRemoveBG] = useState(false);
+  const [isProcessingImages, setIsProcessingImages] = useState(false);
+  
   // Customer info for checkout
   const [customerName, setCustomerName] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
@@ -131,28 +135,47 @@ export default function MicaMagneticPhotosPage() {
   const processAllImages = async () => {
     if (uploadedImages.length === 0) return;
 
-    setIsProcessing(true);
+    setIsProcessingImages(true);
     const newProcessedImages = [];
 
     for (let i = 0; i < uploadedImages.length; i++) {
       const image = uploadedImages[i];
       try {
-        const processedUrl = await removeBackgroundAPI(image.file);
+        let processedUrl;
+        
+        if (useAIRemoveBG) {
+          // ✅ ใช้ AI remove background
+          processedUrl = await removeBackgroundAPI(image.file);
+        } else {
+          // ✅ ไม่ใช้ AI - ใช้รูปต้นฉบับ
+          processedUrl = image.url;
+        }
+        
         newProcessedImages.push({
           ...image,
           processed: true,
-          processedUrl
+          processedUrl,
+          usedAI: useAIRemoveBG
         });
         
         // Update progress
         setProcessedImages([...newProcessedImages]);
       } catch (error) {
         console.error(`Error processing image ${image.name}:`, error);
+        // Add original image if AI fails
+        newProcessedImages.push({
+          ...image,
+          processed: false,
+          processedUrl: image.url,
+          usedAI: false,
+          error: error.message
+        });
+        setProcessedImages([...newProcessedImages]);
       }
     }
 
     setProcessedImages(newProcessedImages);
-    setIsProcessing(false);
+    setIsProcessingImages(false);
     
     // Auto show all images when processing is complete
     if (newProcessedImages.length > 0) {
@@ -505,51 +528,124 @@ export default function MicaMagneticPhotosPage() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           
           {/* Left Column - Upload & Settings */}
-          <div className="lg:col-span-3 space-y-6">
+          <div className="lg:col-span-4 space-y-4">
             
             {/* Image Upload */}
-            <div className="bg-white border-2 border-black rounded-xl p-6">
-              <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-                <Upload size={20} />
+            <div className="bg-white border-2 border-gray-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
+              <h3 className="text-lg font-bold mb-3 flex items-center gap-2 text-gray-800">
+                <Upload size={18} />
                 อัปโหลดรูปภาพ
               </h3>
               
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <input
                   type="file"
                   multiple
                   accept="image/*"
                   onChange={handleImageUpload}
-                  className="w-full p-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-purple-400 transition-colors"
+                  className="w-full p-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-purple-400 transition-colors text-sm"
                 />
                 
                 {uploadedImages.length > 0 && (
                   <div className="space-y-2">
-                    <h4 className="font-semibold">รูปที่อัปโหลด ({uploadedImages.length} รูป)</h4>
-                    <div className="space-y-2 max-h-40 overflow-y-auto">
+                    <h4 className="font-semibold text-sm text-gray-700">รูปที่อัปโหลด ({uploadedImages.length} รูป)</h4>
+                    <div className="space-y-2 max-h-32 overflow-y-auto">
                       {uploadedImages.map((image) => (
-                        <div key={image.id} className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
-                          <img src={image.url} alt={image.name} className="w-12 h-12 object-cover rounded" />
+                        <div key={image.id} className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg border">
+                          <img src={image.url} alt={image.name} className="w-10 h-10 object-cover rounded" />
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium truncate">{image.name}</p>
+                            <p className="text-xs font-medium truncate">{image.name}</p>
                             <p className="text-xs text-gray-500">
                               {image.processed ? '✅ ประมวลผลแล้ว' : '⏳ รอประมวลผล'}
                             </p>
                           </div>
                           <button
                             onClick={() => removeImage(image.id)}
-                            className="text-red-500 hover:text-red-700"
+                            className="text-red-500 hover:text-red-700 p-1"
                           >
-                            <X size={16} />
+                            <X size={14} />
                           </button>
                         </div>
                       ))}
                     </div>
                   </div>
                 )}
+              </div>
+            </div>
+
+            {/* ✅ AI Remove Background Option */}
+            <div className="bg-white border-2 border-gray-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
+              <h3 className="text-lg font-bold mb-3 flex items-center gap-2 text-gray-800">
+                <Sparkles size={18} />
+                ตัวเลือกการประมวลผล
+              </h3>
+              
+              <div className="space-y-3">
+                {/* AI Remove Background Toggle */}
+                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                      useAIRemoveBG ? 'bg-purple-600 border-purple-600' : 'border-gray-300'
+                    }`}>
+                      {useAIRemoveBG && <div className="w-2 h-2 bg-white rounded-full"></div>}
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-900 text-sm">AI Remove Background</p>
+                      <p className="text-xs text-gray-600">ลบพื้นหลังอัตโนมัติด้วย AI</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setUseAIRemoveBG(!useAIRemoveBG)}
+                    className={`px-3 py-1 rounded-lg font-semibold text-sm transition-all ${
+                      useAIRemoveBG 
+                        ? 'bg-purple-600 text-white' 
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
+                  >
+                    {useAIRemoveBG ? 'เปิด' : 'ปิด'}
+                  </button>
+                </div>
+
+                {/* Processing Button */}
+                {uploadedImages.length > 0 && (
+                  <button
+                    onClick={processAllImages}
+                    disabled={isProcessingImages}
+                    className={`w-full py-2.5 px-4 rounded-lg font-bold text-white transition-all flex items-center justify-center gap-2 text-sm ${
+                      isProcessingImages
+                        ? 'bg-gray-400 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700'
+                    }`}
+                  >
+                    {isProcessingImages ? (
+                      <>
+                        <Loader2 className="animate-spin" size={16} />
+                        กำลังประมวลผล...
+                      </>
+                    ) : (
+                      <>
+                        <Zap size={16} />
+                        {useAIRemoveBG ? 'ประมวลผลด้วย AI' : 'ประมวลผลรูปภาพ'}
+                      </>
+                    )}
+                  </button>
+                )}
+
+                {/* Status Info */}
+                <div className="text-xs text-gray-600 bg-blue-50 p-3 rounded-lg border">
+                  <p className="font-semibold mb-1">
+                    {useAIRemoveBG ? '🤖 AI Mode' : '📷 Normal Mode'}
+                  </p>
+                  <p>
+                    {useAIRemoveBG 
+                      ? 'จะลบพื้นหลังอัตโนมัติด้วย AI (ใช้เวลานานขึ้น)'
+                      : 'ใช้รูปต้นฉบับโดยไม่ลบพื้นหลัง (เร็ว)'
+                    }
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -667,16 +763,16 @@ export default function MicaMagneticPhotosPage() {
           </div>
 
           {/* Center Column - Preview (ใหญ่ขึ้น) */}
-          <div className="lg:col-span-6 space-y-6 lg:sticky lg:top-24 lg:self-start">
+          <div className="lg:col-span-5 space-y-4 lg:sticky lg:top-24 lg:self-start">
             
             {/* Slideshow Preview */}
-            <div className="bg-white border-2 border-black rounded-xl p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-bold">Preview บนตู้เย็น</h3>
+            <div className="bg-white border-2 border-gray-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="text-lg font-bold text-gray-800">Preview บนตู้เย็น</h3>
                 <button
                   onClick={toggleShowAll}
                   disabled={processedImages.length === 0}
-                  className={`px-4 py-2 rounded-lg font-semibold transition-all disabled:opacity-50 ${
+                  className={`px-3 py-1.5 rounded-lg font-semibold text-sm transition-all disabled:opacity-50 ${
                     isShowingAll 
                       ? 'bg-red-500 text-white hover:bg-red-600' 
                       : 'bg-green-500 text-white hover:bg-green-600'
@@ -701,7 +797,7 @@ export default function MicaMagneticPhotosPage() {
                     <span className="text-sm font-semibold text-gray-700 whitespace-nowrap">ขนาด:</span>
                     <input
                       type="range"
-                      min="20"
+                      min="5"
                       max="150"
                       value={imageZoom}
                       onChange={(e) => setImageZoom(Number(e.target.value))}
@@ -789,12 +885,12 @@ export default function MicaMagneticPhotosPage() {
           </div>
 
           {/* Right Column - Download & Info */}
-          <div className="lg:col-span-3 space-y-6">
+          <div className="lg:col-span-3 space-y-4">
             
             {/* Customer Info Form */}
-            <div className="bg-white border-2 border-black rounded-xl p-6">
-              <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-                <User size={20} />
+            <div className="bg-white border-2 border-gray-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
+              <h3 className="text-lg font-bold mb-3 flex items-center gap-2 text-gray-800">
+                <User size={18} />
                 ข้อมูลสำหรับสั่งซื้อ
               </h3>
               
@@ -808,7 +904,7 @@ export default function MicaMagneticPhotosPage() {
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
                     placeholder="ชื่อของคุณ"
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none text-sm"
                     required
                   />
                 </div>
@@ -822,7 +918,7 @@ export default function MicaMagneticPhotosPage() {
                     value={customerEmail}
                     onChange={(e) => setCustomerEmail(e.target.value)}
                     placeholder="your@email.com"
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none text-sm"
                     required
                   />
                 </div>
@@ -836,7 +932,7 @@ export default function MicaMagneticPhotosPage() {
                     value={customerPhone}
                     onChange={(e) => setCustomerPhone(e.target.value)}
                     placeholder="08X-XXX-XXXX"
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none text-sm"
                   />
                 </div>
               </div>
@@ -879,16 +975,16 @@ export default function MicaMagneticPhotosPage() {
                   <button
                     onClick={proceedToCheckout}
                     disabled={!customerName || !customerEmail || isProceedingToCheckout}
-                    className="w-full bg-gradient-to-r from-orange-600 to-red-600 text-white font-bold py-4 px-6 rounded-lg hover:from-orange-700 hover:to-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 shadow-lg"
+                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-2.5 px-4 rounded-lg hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 text-sm"
                   >
                     {isProceedingToCheckout ? (
                       <>
-                        <Loader2 className="animate-spin" size={20} />
+                        <Loader2 className="animate-spin" size={16} />
                         <span>กำลังเตรียมการชำระเงิน...</span>
                       </>
                     ) : (
                       <>
-                        <ShoppingCart size={20} />
+                        <ShoppingCart size={16} />
                         <span>สั่งซื้อและชำระเงิน</span>
                       </>
                     )}
