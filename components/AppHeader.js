@@ -172,9 +172,9 @@ export default function AppHeader() {
               />
               
               {/* Full Screen Menu */}
-              <div className="fixed inset-0 bg-white transform transition-transform duration-300 ease-in-out">
+              <div className="fixed inset-0 bg-white transform transition-transform duration-300 ease-in-out flex flex-col">
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-purple-600 to-pink-600">
+                <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-purple-600 to-pink-600 flex-shrink-0">
                   <div className="flex items-center gap-4">
                     <Image
                       src={LOGO}
@@ -194,7 +194,8 @@ export default function AppHeader() {
                 </div>
 
                 {/* Menu Items */}
-                <div className="p-6 space-y-3 h-full overflow-y-auto">
+                <div className="flex-1 overflow-y-auto px-6 py-4">
+                  <div className="space-y-3">
                   {mobileMenuItems.map((item, index) => {
                     const IconComponent = item.icon;
                     const isDisabled = item.href === "/mica-magnetic-photos";
@@ -244,6 +245,7 @@ export default function AppHeader() {
                       </Link>
                     );
                   })}
+                  </div>
                 </div>
               </div>
             </div>
@@ -350,20 +352,20 @@ export default function AppHeader() {
                 <span>Pet Pillow</span>
               </Link> */}
 
-              <div
+              {/* <div
                 className="flex items-center gap-1 px-2 py-1.5 rounded text-xs font-bold border border-gray-300 bg-gradient-to-br from-gray-100 to-gray-200 cursor-not-allowed opacity-50 transition-all duration-150"
               >
                 <Magnet size={14} className="text-gray-400" />
                 <span className="text-gray-500">Mica</span>
-              </div>
+              </div> */}
 
-              <Link
+              {/* <Link
                 href="/remove-background"
-                className="flex items-center gap-1 px-2 py-1.5 rounded text-xs font-bold border border-black bg-gradient-to-br from-cyan-50 to-cyan-100 hover:from-cyan-100 hover:to-cyan-200 hover:-translate-y-0.5 hover:shadow-[2px_2px_0_#000] active:translate-y-0 active:shadow-[1px_1px_0_#000] transition-all duration-150"
+                className="flex items-center gap-1 px-2 py-1.5 rounded text-xs font-bold border border-black bg-gradient-to-br from-cyan-50 to-cyan-100 hover:from-cyan-100 hover:to-cyan-200 hover:-translate-y-0.5 hover:shadow-[2px_2px_0_#000] active:translate-y-0 active:shadow-[1px_1px_0_#000] transition-all duration-150 "
               >
                 <Scissors size={14} className="text-cyan-600" />
                 <span>BG</span>
-              </Link>
+              </Link> */}
             </div>
           </div>
         </div>
