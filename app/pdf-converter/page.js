@@ -9,6 +9,7 @@ import { StatBar } from "@/components/StatBar";
 import { convertPdfSingle, convertPdfAll } from "@/lib/pdfApi";
 import { createClient } from "@/utils/supabase/client";
 import { toast } from "sonner";
+import { trackPdfConverter, trackEvent, EVENTS, CATEGORIES } from "@/lib/analytics";
 
 export default function PdfConverterPage() {
   const supabase = createClient();
@@ -32,6 +33,7 @@ export default function PdfConverterPage() {
     if (!file) {
       setError("กรุณาเลือกไฟล์ PDF");
       toast.error("❌ กรุณาเลือกไฟล์ PDF ก่อนเริ่มแปลง");
+      trackEvent(EVENTS.BUTTON_CLICK, CATEGORIES.USER_INTERACTION, 'pdf_convert_no_file', 0);
       return;
     }
 
@@ -39,8 +41,12 @@ export default function PdfConverterPage() {
     if (activeTab === "single" && (!settings.page || settings.page < 1)) {
       setError("กรุณาระบุหมายเลขหน้าที่ถูกต้อง (เริ่มจาก 1)");
       toast.error("❌ กรุณาระบุหมายเลขหน้าที่ถูกต้อง (เริ่มจาก 1)");
+      trackEvent(EVENTS.BUTTON_CLICK, CATEGORIES.USER_INTERACTION, 'pdf_convert_invalid_page', 0);
       return;
     }
+
+    // Track PDF conversion start
+    trackPdfConverter.convert(activeTab, 1);
 
     toast.info("⚙️ กำลังแปลง PDF...");
     setLoading(true);
@@ -100,6 +106,9 @@ export default function PdfConverterPage() {
       } else {
         setResult({ ok: true, ...response });
       }
+      
+      // Track PDF conversion success
+      trackPdfConverter.success(1, 1);
       
       toast.success("✅ แปลง PDF สำเร็จ!");
 
@@ -207,7 +216,10 @@ export default function PdfConverterPage() {
                 subtitle={`${activeTab === "single" ? "ขนาด นามสกุล และหมายเลขหน้า" : "ขนาด และนามสกุล"}`}
                 right={
                   <button
-                    onClick={handleConvert}
+                    onClick={() => {
+                      trackEvent(EVENTS.BUTTON_CLICK, CATEGORIES.USER_INTERACTION, 'pdf_convert_button', 1);
+                      handleConvert();
+                    }}
                     disabled={loading || !file}
                     className={`px-3 py-2 border-2 border-black rounded-lg font-semibold
                     motion-safe:transition-all duration-150

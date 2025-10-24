@@ -3,6 +3,7 @@
 import { useState } from "react";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
+import { trackDownload } from "@/lib/analytics";
 
 function deriveName(item, index) {
   // ใช้ชื่อจาก API ก่อน
@@ -27,6 +28,10 @@ export default function DownloadAllButton({ results = [] }) {
 
   const handleDownloadAll = async () => {
     if (!canDownload || downloading) return;
+    
+    // Track download event
+    trackDownload('zip_all', results.length);
+    
     setDownloading(true);
     setProgress(0);
 

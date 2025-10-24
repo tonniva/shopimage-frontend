@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import PresetCards from "@/components/PresetCards";
+import { trackEvent, trackConversionStart, EVENTS, CATEGORIES } from "@/lib/analytics";
 
 /**
  * i18n dictionary
@@ -97,18 +98,17 @@ export function SettingsPanel({
               {L.width}
             </Label>
  
-            <div className="rounded-xl border border-black/70 bg-gray-50 shadow-inner p-3">
+            <div className="rounded-xl border-2 border-gray-300 bg-gradient-to-r from-white to-gray-50 shadow-inner p-3 hover:border-gray-400 transition-colors duration-200">
               <div className="relative">
-
                 <Input
                   id={wid}
                   inputMode="numeric"
-                  placeholder=""
+                  placeholder="เช่น 1080"
                   value={value.target_w}
                   onChange={set("target_w")}
-                  className="bg-white/60 border border-black/70 focus:bg-white focus:ring-2 focus:ring-black pr-[15px]"
+                  className="bg-white/80 border-2 border-gray-300 focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-200 pr-[35px] transition-all duration-200 hover:border-gray-400"
                 />
-                <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500">
+                <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500 font-medium">
                   {L.unitPx}
                 </span>
               </div>
@@ -121,17 +121,17 @@ export function SettingsPanel({
             <Label htmlFor={hid} className="text-[13px] font-semibold">
               {L.height}
             </Label>
-            <div className="rounded-xl border border-black/70 bg-gray-50 shadow-inner p-3">
+            <div className="rounded-xl border-2 border-gray-300 bg-gradient-to-r from-white to-gray-50 shadow-inner p-3 hover:border-gray-400 transition-colors duration-200">
               <div className="relative">
                 <Input
                   id={hid}
                   inputMode="numeric"
-                  placeholder=""
+                  placeholder="เช่น 1080"
                   value={value.target_h}
                   onChange={set("target_h")}
-                  className="bg-white/60 border border-black/70 focus:bg-white focus:ring-2 focus:ring-black pr-[15px]"
+                  className="bg-white/80 border-2 border-gray-300 focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-200 pr-[35px] transition-all duration-200 hover:border-gray-400"
                 />
-                <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500">
+                <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500 font-medium">
                   {L.unitPx}
                 </span>
               </div>
@@ -145,17 +145,17 @@ export function SettingsPanel({
           <Label htmlFor={fid} className="text-[13px] font-semibold">
             {L.format}
           </Label>
-          <Field>
+          <div className="rounded-xl border-2 border-gray-300 bg-gradient-to-r from-white to-gray-50 shadow-inner p-3 hover:border-gray-400 transition-colors duration-200">
             <Select
               id={fid}
               value={value.format}
               onChange={set("format")}
-              className="w-full bg-white/60 border border-black/70 focus:ring-2 focus:ring-black"
+              className="w-full bg-white/80 border-2 border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all duration-200 hover:border-gray-400"
             >
               <option value="webp">{L.formatWebp}</option>
               <option value="jpeg">{L.formatJpeg}</option>
             </Select>
-          </Field>
+          </div>
         </div>
 
         {/* Max upload per file (MB) */}
@@ -195,18 +195,19 @@ export function SettingsPanel({
           <Label htmlFor={sk} className="text-[13px] font-semibold">
             {L.maxOutput}
           </Label>
-          <div className="rounded-xl border border-black/70 bg-gray-50 shadow-inner p-3">
+          <div className="rounded-xl border-2 border-gray-300 bg-gradient-to-r from-white to-gray-50 shadow-inner p-3 hover:border-gray-400 transition-colors duration-200">
             <div className="relative">
               <Input
                 id={sk}
                 type="number"
                 min="50"
                 step="50"
+                placeholder="เช่น 400"
                 value={value.max_kb}
                 onChange={set("max_kb")}
-                className="bg-white/60 border border-black/70 focus:bg-white focus:ring-2 focus:ring-black pr-12"
+                className="bg-white/80 border-2 border-gray-300 focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-200 pr-[35px] transition-all duration-200 hover:border-gray-400"
               />
-              <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500">
+              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500 font-medium">
                 {L.unitKB}
               </span>
             </div>
@@ -216,15 +217,29 @@ export function SettingsPanel({
 
         {/* Submit */}
         <Button
-          className={`w-full border border-black bg-black text-black
-                     transition-all duration-150
-                     hover:-translate-y-0.5 hover:shadow-[4px_4px_0_#000]
-                     active:translate-y-0 active:shadow-[2px_2px_0_#000] active:scale-[0.98]
-                     ${!loading && hasFiles ? 'convert-ready' : ''}`}
-          onClick={onSubmit}
+          className={`w-full border-2 border-black rounded-lg font-bold text-lg py-3
+                     motion-safe:transition-all duration-200
+                     hover:-translate-y-1 hover:shadow-[6px_6px_0_#000]
+                     active:translate-y-0 active:shadow-[2px_2px_0_#000] active:scale-[0.95]
+                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black
+                     disabled:opacity-50 disabled:cursor-not-allowed
+                     ${!loading && hasFiles 
+                       ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white hover:from-emerald-600 hover:to-teal-700' 
+                       : 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-500 hover:from-gray-200 hover:to-gray-300'}`}
+          onClick={() => {
+            trackEvent(EVENTS.BUTTON_CLICK, CATEGORIES.USER_INTERACTION, 'convert_button', 1);
+            onSubmit();
+          }}
           disabled={loading}
         >
-          {loading ? L.converting : L.convert}
+          {loading ? (
+            <div className="flex items-center justify-center gap-2">
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              <span>{L.converting}</span>
+            </div>
+          ) : (
+            <span>{L.convert}</span>
+          )}
         </Button>
       </CardContent>
     </Card>

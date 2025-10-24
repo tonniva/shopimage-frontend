@@ -14,6 +14,7 @@ import { StatBar } from "@/components/StatBar";
 import { toast } from "sonner";
 import { createClient } from "@/utils/supabase/client";
 import SeoContent from "@/components/SeoContent";
+import { trackEvent, trackConversionStart, trackConversionSuccess, trackConversionFailure, EVENTS, CATEGORIES } from "@/lib/analytics";
 
 const dict = {
   th: {
@@ -127,8 +128,12 @@ export default function HomePage({ lang = "th" }) {
     if (!files.length) {
       setError(t.needFiles);
       toast.error(t.needFiles);
+      trackEvent(EVENTS.BUTTON_CLICK, CATEGORIES.USER_INTERACTION, 'convert_button_no_files', 0);
       return;
     }
+
+    // Track conversion start
+    trackConversionStart(files.length, settings);
 
     toast.info(t.convertingInfo);
     setProgressItems(files.map(f => ({ name: f.name, progress: 0, phase: "queued" })));
@@ -180,10 +185,16 @@ export default function HomePage({ lang = "th" }) {
 
       setResults(out);
 
-      if (out.some(it => it.ok)) {
+      // Track conversion results
+      const successCount = out.filter(it => it.ok).length;
+      const failureCount = out.filter(it => !it.ok).length;
+
+      if (successCount > 0) {
+        trackConversionSuccess(files.length, successCount, settings);
         toast.success(t.someOk);
         fireConfetti();
       } else {
+        trackConversionFailure(files.length, 'all_files_failed');
         toast.error(t.allFailed);
       }
 
@@ -201,15 +212,42 @@ export default function HomePage({ lang = "th" }) {
   };
 
   function fireConfetti() {
-    confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 } });
-    confetti({ particleCount: 60, angle: 60, spread: 55, origin: { x: 0 } });
-    confetti({ particleCount: 60, angle: 120, spread: 55, origin: { x: 1 } });
-    setTimeout(() => confetti({ particleCount: 80, spread: 80, scalar: 0.9 }), 200);
-    setTimeout(() => confetti({ particleCount: 60, spread: 70, scalar: 1.1 }), 400);
+    confetti({ 
+      particleCount: 120, 
+      spread: 70, 
+      origin: { y: 0.6 },
+      colors: ['#10b981', '#06b6d4', '#8b5cf6', '#f59e0b', '#ef4444']
+    });
+    confetti({ 
+      particleCount: 60, 
+      angle: 60, 
+      spread: 55, 
+      origin: { x: 0 },
+      colors: ['#10b981', '#06b6d4', '#8b5cf6', '#f59e0b']
+    });
+    confetti({ 
+      particleCount: 60, 
+      angle: 120, 
+      spread: 55, 
+      origin: { x: 1 },
+      colors: ['#10b981', '#06b6d4', '#8b5cf6', '#f59e0b']
+    });
+    setTimeout(() => confetti({ 
+      particleCount: 80, 
+      spread: 80, 
+      scalar: 0.9,
+      colors: ['#10b981', '#06b6d4', '#8b5cf6']
+    }), 200);
+    setTimeout(() => confetti({ 
+      particleCount: 60, 
+      spread: 70, 
+      scalar: 1.1,
+      colors: ['#f59e0b', '#ef4444', '#8b5cf6']
+    }), 400);
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-white text-black">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-emerald-50 text-black">
       <header className="border-b border-black bg-white">
         <div className="max-w-6xl mx-auto px-4 md:px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -228,7 +266,13 @@ export default function HomePage({ lang = "th" }) {
         <div className="grid md:grid-cols-3 gap-6 md:gap-8">
           <div className="md:col-span-2 space-y-6">
             <SectionCard title={t.uploadTitle} subtitle={t.uploadSub}>
-                          <UploadBox lang={lang } files={files} setFiles={setFiles} />
+              <UploadBox lang={lang} files={files} setFiles={setFiles} />
+              {files.length > 0 && (
+                <div className="mt-3 flex items-center gap-2 text-emerald-600 animate-pulse">
+                  <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce"></div>
+                  <span className="text-sm font-semibold">พร้อมแปลง {files.length} ไฟล์</span>
+                </div>
+              )}
               {error ? <p className="text-sm text-red-600 mt-2">{error}</p> : null}
             </SectionCard>
 
@@ -260,17 +304,29 @@ export default function HomePage({ lang = "th" }) {
                 subtitle={t.settingsSub}
                 right={
                   <button
-                    onClick={handleConvert}
+                    onClick={() => {
+                      trackEvent(EVENTS.BUTTON_CLICK, CATEGORIES.USER_INTERACTION, 'convert_button_main', files.length);
+                      handleConvert();
+                    }}
                     disabled={loading || !files.length}
-                    className={`px-3 py-2 border-2 border-black text-black rounded-lg
-                    motion-safe:transition-all duration-150
-                    hover:-translate-y-0.5 hover:shadow-[4px_4px_0_#000]
-                    active:translate-y-0 active:shadow-[2px_2px_0_#000] active:scale-[0.98]
+                    className={`px-4 py-3 border-2 border-black rounded-lg font-bold text-lg
+                    motion-safe:transition-all duration-200
+                    hover:-translate-y-1 hover:shadow-[6px_6px_0_#000]
+                    active:translate-y-0 active:shadow-[2px_2px_0_#000] active:scale-[0.95]
                     focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black
                     disabled:opacity-50 disabled:cursor-not-allowed
-                    ${!loading && files.length > 0 ? 'convert-ready' : ''}`}
+                    ${!loading && files.length > 0 
+                      ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white hover:from-emerald-600 hover:to-teal-700' 
+                      : 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-500 hover:from-gray-200 hover:to-gray-300'}`}
                   >
-                    {loading ? t.converting : t.convert}
+                    {loading ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span>{t.converting}</span>
+                      </div>
+                    ) : (
+                      <span>{t.convert}</span>
+                    )}
                   </button>
                 }
               >
