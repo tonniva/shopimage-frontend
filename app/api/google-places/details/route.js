@@ -1,55 +1,36 @@
+// app/api/google-places/details/route.js
 import { NextResponse } from 'next/server';
+import { getPlaceDetails } from '@/lib/google-places';
 
-export async function POST(request) {
+export async function GET(request) {
   try {
-    const { place_id } = await request.json();
+    const { searchParams } = new URL(request.url);
+    const placeId = searchParams.get('place_id');
+    const language = searchParams.get('language') || 'th';
 
-    if (!place_id) {
+    if (!placeId) {
       return NextResponse.json(
         { error: 'Place ID is required' },
         { status: 400 }
       );
     }
 
-    const apiKey = process.env.GOOGLE_PLACES_API_KEY;
-    if (!apiKey) {
+    const result = await getPlaceDetails(placeId, language);
+
+    if (!result.success) {
       return NextResponse.json(
-        { error: 'Google Places API key not configured' },
-        { status: 500 }
-      );
-    }
-
-    // Build Google Places Details API URL
-    const baseUrl = 'https://maps.googleapis.com/maps/api/place/details/json';
-    const params = new URLSearchParams({
-      place_id: place_id,
-      key: apiKey,
-      language: 'th', // Thai language
-      fields: 'formatted_address,address_components,geometry'
-    });
-
-    const response = await fetch(`${baseUrl}?${params}`);
-    
-    if (!response.ok) {
-      throw new Error(`Google Places API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    if (data.status !== 'OK') {
-      console.error('Google Places Details API error:', data.status, data.error_message);
-      return NextResponse.json(
-        { error: 'Google Places API error', details: data.error_message },
+        { error: result.error },
         { status: 500 }
       );
     }
 
     return NextResponse.json({
-      result: data.result
+      success: true,
+      place: result.place
     });
 
   } catch (error) {
-    console.error('Error in Google Places details:', error);
+    console.error('Error getting place details:', error);
     return NextResponse.json(
       { error: 'Internal server error', details: error.message },
       { status: 500 }

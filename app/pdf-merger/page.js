@@ -241,7 +241,7 @@ export default function PDFMerger() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-white">
       {/* Header */}
-      <header className="bg-gradient-to-r from-purple-600 to-pink-600 border-b-2 border-black sticky top-0 z-0 shadow-lg">
+      <header className="bg-gradient-to-r from-purple-600 to-pink-600 border-b-2 border-black   top-0 z-0 shadow-lg">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 text-sm font-semibold text-white hover:text-pink-200 transition-colors">
             <ArrowLeft size={20} />

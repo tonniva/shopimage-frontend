@@ -10,7 +10,7 @@ export const metadata = {
 export default function FacebookImageGuide() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
-      <header className="bg-white border-b-2 border-black sticky top-0 z-50">
+      <header className="bg-white border-b-2 border-black   top-0 z-50">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 text-sm font-semibold hover:text-blue-600 transition-colors">
             <ArrowLeft size={20} />

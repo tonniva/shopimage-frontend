@@ -298,7 +298,7 @@ export default function HomePage({ lang = "th" }) {
           </div>
 
           <div className="md:col-span-1">
-            <div className="md:sticky md:top-6 space-y-4">
+            <div className="md:  md:top-6 space-y-4">
               <SectionCard
                 title={t.settingsTitle}
                 subtitle={t.settingsSub}

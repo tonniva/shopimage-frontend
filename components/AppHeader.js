@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { AuthHeader } from "@/components/AuthHeader";
-import { ImageIcon, FileText, QrCode, Image as ImageIconLucide, Film, Layers, PawPrint, Bed, Magnet, Scissors, Menu, X } from "lucide-react";
+import { ImageIcon, FileText, QrCode, Image as ImageIconLucide, Film, Layers, PawPrint, Bed, Magnet, Scissors, Menu, X, Home } from "lucide-react";
 
 // Professional UX/UI optimized header
 export default function AppHeader() {
@@ -20,6 +20,7 @@ export default function AppHeader() {
   const mobileMenuItems = [
     { href: "/", icon: ImageIcon, label: "IMG to WEBP", color: "blue" },
     { href: "/pdf-converter", icon: FileText, label: "PDF to JPG", color: "red" },
+    { href: "/property-snap", icon: Home, label: "Property Snap", color: "indigo" },
     { href: "/add-qr-to-image", icon: QrCode, label: "Add QR Code", color: "purple" },
     { href: "/add-logo-to-image", icon: ImageIconLucide, label: "Add Logo", color: "green" },
     { href: "/gif-maker", icon: Film, label: "GIF Maker", color: "orange" },
@@ -91,7 +92,7 @@ export default function AppHeader() {
   if (!isMounted) {
     // Return a simplified version for SSR
     return (
-      <header className="sticky top-0 z-50 bg-white border-b-2 border-black shadow-[0_4px_12px_rgba(0,0,0,0.08)]">
+      <header className="bg-white border-b-2 border-black shadow-[0_4px_12px_rgba(0,0,0,0.08)]">
         <div className="mx-auto max-w-7xl px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -121,7 +122,7 @@ export default function AppHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b-2 border-black shadow-[0_4px_12px_rgba(0,0,0,0.08)]" suppressHydrationWarning>
+    <header className="bg-white border-b-2 border-black shadow-[0_4px_12px_rgba(0,0,0,0.08)]" suppressHydrationWarning>
       <div className="mx-auto max-w-7xl">
         {/* Mobile Layout */}
         <div className="md:hidden">
@@ -220,6 +221,7 @@ export default function AppHeader() {
                         className={`flex items-center gap-4 px-6 py-4 rounded-xl border-2 border-black bg-gradient-to-r hover:shadow-lg active:scale-95 transition-all duration-150 ${
                           item.color === 'blue' ? 'from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200' :
                           item.color === 'red' ? 'from-red-50 to-red-100 hover:from-red-100 hover:to-red-200' :
+                          item.color === 'indigo' ? 'from-indigo-50 to-indigo-100 hover:from-indigo-100 hover:to-indigo-200' :
                           item.color === 'purple' ? 'from-purple-50 to-purple-100 hover:from-purple-100 hover:to-purple-200' :
                           item.color === 'green' ? 'from-green-50 to-green-100 hover:from-green-100 hover:to-green-200' :
                           item.color === 'orange' ? 'from-orange-50 to-orange-100 hover:from-orange-100 hover:to-orange-200' :
@@ -233,6 +235,7 @@ export default function AppHeader() {
                           className={
                             item.color === 'blue' ? 'text-blue-600' :
                             item.color === 'red' ? 'text-red-600' :
+                            item.color === 'indigo' ? 'text-indigo-600' :
                             item.color === 'purple' ? 'text-purple-600' :
                             item.color === 'green' ? 'text-green-600' :
                             item.color === 'orange' ? 'text-orange-600' :
@@ -303,6 +306,14 @@ export default function AppHeader() {
               >
                 <FileText size={14} className="text-red-600" />
                 <span>PDF</span>
+              </Link>
+
+              <Link
+                href="/property-snap"
+                className="flex items-center gap-1 px-2 py-1.5 rounded text-xs font-bold border border-black bg-gradient-to-br from-indigo-50 to-indigo-100 hover:from-indigo-100 hover:to-indigo-200 hover:-translate-y-0.5 hover:shadow-[2px_2px_0_#000] active:translate-y-0 active:shadow-[1px_1px_0_#000] transition-all duration-150"
+              >
+                <Home size={14} className="text-indigo-600" />
+                <span>Property</span>
               </Link>
 
               <Link

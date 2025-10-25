@@ -408,8 +408,8 @@ export default function PetToPillowPage() {
             </button>
           </div>
 
-          {/* Center Column - Preview (Sticky) */}
-          <div className="lg:sticky lg:top-24 lg:self-start">
+          {/* Center Column - Preview ( ) */}
+          <div className="lg:  lg:top-24 lg:self-start">
             <div className="space-y-6">
               
               {/* Preview */}

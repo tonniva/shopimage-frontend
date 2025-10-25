@@ -210,7 +210,7 @@ export default function PdfConverterPage() {
 
           {/* Right: Settings */}
           <div className="md:col-span-1">
-            <div className="md:sticky md:top-6 space-y-4">
+            <div className="md:  md:top-6 space-y-4">
               <SectionCard
                 title="Settings"
                 subtitle={`${activeTab === "single" ? "ขนาด นามสกุล และหมายเลขหน้า" : "ขนาด และนามสกุล"}`}

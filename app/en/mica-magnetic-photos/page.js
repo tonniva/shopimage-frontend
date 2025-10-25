@@ -756,7 +756,7 @@ export default function MicaMagneticPhotosPage() {
           </div>
 
           {/* Center Column - Preview (ใหญ่ขึ้น) */}
-          <div className="lg:col-span-6 space-y-6 lg:sticky lg:top-24 lg:self-start">
+          <div className="lg:col-span-6 space-y-6 lg:  lg:top-24 lg:self-start">
             
             {/* Slideshow Preview */}
             <div className="bg-white border-2 border-black rounded-xl p-6">

@@ -236,7 +236,7 @@ function CheckoutContent() {
           </div>
 
           <div>
-            <div className="bg-white border-2 border-black rounded-xl p-6 sticky top-8">
+            <div className="bg-white border-2 border-black rounded-xl p-6   top-8">
               <h3 className="text-xl font-bold mb-6">Payment Method</h3>
               
               {clientSecret && (

@@ -754,7 +754,7 @@ export default function MicaMagneticPhotosPage() {
                   <div className="border-t pt-2">
                     <div className="flex justify-between text-lg font-bold">
                       <span>รวม:</span>
-                      <span className="text-purple-600">{calculateTotalPrice()} บาท</span>
+                      <span className="text-purple-600">{calculateTotalPrice().toLocaleString('en-US')} บาท</span>
                     </div>
                   </div>
                 </div>
@@ -763,7 +763,7 @@ export default function MicaMagneticPhotosPage() {
           </div>
 
           {/* Center Column - Preview (ใหญ่ขึ้น) */}
-          <div className="lg:col-span-5 space-y-4 lg:sticky lg:top-24 lg:self-start">
+          <div className="lg:col-span-5 space-y-4 lg:  lg:top-24 lg:self-start">
             
             {/* Slideshow Preview */}
             <div className="bg-white border-2 border-gray-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow">
@@ -968,7 +968,7 @@ export default function MicaMagneticPhotosPage() {
                       <div className="border-t border-blue-200 pt-2 mt-2">
                         <div className="flex justify-between text-lg">
                           <span className="font-bold text-gray-800">รวมทั้งหมด:</span>
-                          <span className="font-bold text-blue-600">{calculateTotalPrice()} บาท</span>
+                          <span className="font-bold text-blue-600">{calculateTotalPrice().toLocaleString('en-US')} บาท</span>
                         </div>
                       </div>
                     </div>

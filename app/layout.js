@@ -4,6 +4,7 @@ import AuthProvider from "@/components/AuthProvider";
 import LayoutContent from "@/components/LayoutContent";
 import Script from "next/script";
 import { Kanit } from "next/font/google";
+import SessionProviderWrapper from "@/components/SessionProviderWrapper";
 
 const kanit = Kanit({
   weight: ['200', '300', '400', '500', '600', '700', '800'],
@@ -96,10 +97,12 @@ export default function RootLayout({ children }) {
         )}
       </head>
       <body className={`${kanit.className} antialiased`}>
-        <AuthProvider>
-          <LayoutContent>{children}</LayoutContent>
-          <Toaster richColors position="top-right" />
-        </AuthProvider>
+        <SessionProviderWrapper>
+          <AuthProvider>
+            <LayoutContent>{children}</LayoutContent>
+            <Toaster richColors position="top-right" />
+          </AuthProvider>
+        </SessionProviderWrapper>
       </body>
     </html>
   );
