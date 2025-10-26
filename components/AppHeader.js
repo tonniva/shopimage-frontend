@@ -89,6 +89,11 @@ export default function AppHeader() {
     return () => clearInterval(timer);
   }, [pathname, isMounted]);
 
+  // Hide header on share pages (after hooks)
+  if (pathname && pathname.startsWith('/share/')) {
+    return null;
+  }
+
   if (!isMounted) {
     // Return a simplified version for SSR
     return (

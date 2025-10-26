@@ -40,6 +40,11 @@ export default function SharedPropertyReportPage() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showImagePreview, setShowImagePreview] = useState(false);
   const [previewImageIndex, setPreviewImageIndex] = useState(0);
+  
+  // Header slideshow state
+  const [headers, setHeaders] = useState([]);
+  const [currentHeaderIndex, setCurrentHeaderIndex] = useState(0);
+  const [headerSettings, setHeaderSettings] = useState({ autoSlide: true, slideDelay: 5000 });
 
   const fetchReport = useCallback(async () => {
     try {
@@ -74,7 +79,44 @@ export default function SharedPropertyReportPage() {
       // false = not owner
       trackPropertySnap?.view?.(report.id, false);
     }
+    
+    // Fetch headers for slideshow
+    if (report?.user?.id) {
+      fetchHeaders(report.user.id);
+    }
   }, [report]);
+  
+  // Header slideshow logic
+  useEffect(() => {
+    if (headers.length > 1 && headerSettings.autoSlide) {
+      const timer = setInterval(() => {
+        setCurrentHeaderIndex(prev => 
+          prev === headers.length - 1 ? 0 : prev + 1
+        );
+      }, headerSettings.slideDelay);
+      
+      return () => clearInterval(timer);
+    }
+  }, [headers, headerSettings]);
+  
+  const fetchHeaders = async (userId) => {
+    try {
+      const response = await fetch(`/api/property-snap/header/share?userId=${userId}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.headers && data.headers.length > 0) {
+          setHeaders(data.headers);
+          // Get settings from first header
+          setHeaderSettings({
+            autoSlide: data.headers[0].autoSlide,
+            slideDelay: data.headers[0].slideDelay
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching headers:', error);
+    }
+  };
 
   const getPlaceIcon = (type) => {
     switch (type) {
@@ -201,43 +243,78 @@ export default function SharedPropertyReportPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                <Home className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h1 className="text-lg font-bold text-gray-900">รายงานอสังหาริมทรัพย์</h1>
-                <p className="text-xs text-gray-500">Property Report</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={shareReport}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                title="แชร์รายงาน"
+      <div className="px-1 py-1">
+        {/* Header Slideshow - Show custom or default */}
+        {headers.length > 0 ? (
+          <div className="w-full h-64 mb-2 rounded-sm overflow-hidden shadow-lg relative">
+            {headers.map((header, index) => (
+              <div
+                key={header.id}
+                className={`absolute inset-0 transition-opacity duration-1000 ${
+                  index === currentHeaderIndex ? 'opacity-100' : 'opacity-0'
+                }`}
               >
-                <Share2 className="w-5 h-5 text-gray-600" />
-              </button>
-              <button
-                onClick={openInMaps}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                title="เปิดใน Google Maps"
-              >
-                <ExternalLink className="w-5 h-5 text-gray-600" />
-              </button>
+                <img
+                  src={header.url}
+                  alt={`Header Banner ${index + 1}`}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            ))}
+            {headers.length > 1 && (
+              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
+                {headers.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentHeaderIndex(index)}
+                    className={`w-2 h-2 rounded-full transition-all ${
+                      index === currentHeaderIndex
+                        ? 'bg-white w-6'
+                        : 'bg-white/50 hover:bg-white/75'
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="w-full h-64 mb-2 rounded-sm overflow-hidden shadow-lg relative">
+            {/* Default Header Image */}
+            <img
+              src="/header/chicago-city-urban-skyline-panorama.jpg"
+              alt="Default Header"
+              className="w-full h-full object-cover"
+            />
+            
+            {/* Dark Overlay for better text visibility */}
+            <div className="absolute inset-0 bg-black/30"></div>
+            
+            {/* Content */}
+            <div className="absolute inset-0 flex items-center justify-center z-10">
+              <div className="text-center text-white">
+                <div className="mb-4 inline-block p-3 bg-white/10 backdrop-blur-sm rounded-full">
+                  <Home className="w-12 h-12 mx-auto drop-shadow-2xl" />
+                </div>
+                <h2 className="text-2xl sm:text-3xl font-bold mb-2" style={{ textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)' }}>
+                  สร้าง Link แชร์รายงานอสังหาริมทรัพย์ของคุณ
+                </h2>
+                <p className="text-base sm:text-lg text-white/90 mb-4" style={{ textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)' }}>
+                  ลงฟรี ขาย อสังหาริมทรัพย์ ของคุณ
+                </p>
+                <a 
+                  href="/property-snap"
+                  className="inline-block bg-white text-blue-600 px-6 py-2 rounded-lg font-semibold text-sm hover:bg-blue-50 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+                >
+                  สร้างฟรี
+                </a>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-
-      <div className="max-w-6xl mx-auto px-2 py-2">
+        )}
+        
         {/* Hero Image Gallery */}
         {report.images && report.images.length > 0 && (
-          <div className="bg-white rounded-2xl shadow-lg overflow-hidden mb-6">
+          <div className="bg-white rounded-sm shadow-sm overflow-hidden mb-6">
             {/* Main Image */}
             <div className="relative">
               <div className="aspect-[16/9] bg-gray-100">
@@ -295,9 +372,9 @@ export default function SharedPropertyReportPage() {
         )}
 
         {/* Property Overview */}
-        <div className="bg-white rounded-2xl shadow-lg p-2 mb-6">
+        <div className="bg-white rounded-2xl shadow-sm p-2 mb-3">
           <div className="mb-6">
-            <h1 className="text-2xl font-bold text-gray-900 mb-3">
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">
               {report.title}
             </h1>
             <p className="text-gray-600 leading-relaxed text-lg">
@@ -306,11 +383,11 @@ export default function SharedPropertyReportPage() {
           </div>
             
           {/* Price and Key Info */}
-          <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-2 mb-2">
+          <div className="bg-gradient-to-r from-orange-50 to-black-50 rounded-xl p-2 mb-2 shadow-md">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
               <div className="flex-1">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-12 h-12  rounded-full flex items-center justify-center">
                     <DollarSign className="w-6 h-6 text-blue-600" />
                   </div>
                   <div>
@@ -319,7 +396,7 @@ export default function SharedPropertyReportPage() {
                       {report.listingType === 'rent' && 'ให้เช่า'}
                       {report.listingType === 'both' && 'ขาย/เช่า'}
                     </div>
-                    <div className="text-2xl font-bold text-blue-600">
+                    <div className="text-4xl font-bold text-blue-600">
                       {Number(report.price).toLocaleString('en-US')} บาท
                     </div>
                   
@@ -339,9 +416,9 @@ export default function SharedPropertyReportPage() {
           </div>
 
           {/* Details grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mb-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mb-2">
             {report.area && (
-              <div className="bg-gray-50 rounded-lg p-2 sm:p-3 text-center hover:bg-gray-100 transition-colors">
+              <div className="bg-gray-50 rounded-lg p-2 sm:p-3 text-center hover:bg-gray-100 transition-colors shadow-md">
                 <div className="flex items-center justify-center mb-1">
                   <Square className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
                 </div>
@@ -350,7 +427,7 @@ export default function SharedPropertyReportPage() {
               </div>
             )}
             {report.landArea && (
-              <div className="bg-gray-50 rounded-lg p-2 sm:p-3 text-center hover:bg-gray-100 transition-colors">
+              <div className="bg-gray-50 rounded-lg p-2 sm:p-3 text-center hover:bg-gray-100 transition-colors shadow-md">
                 <div className="flex items-center justify-center mb-1">
                   <TreePine className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
                 </div>
@@ -359,7 +436,7 @@ export default function SharedPropertyReportPage() {
               </div>
             )}
             {report.bedrooms && (
-              <div className="bg-gray-50 rounded-lg p-2 sm:p-3 text-center hover:bg-gray-100 transition-colors">
+              <div className="bg-gray-50 rounded-lg p-2 sm:p-3 text-center hover:bg-gray-100 transition-colors shadow-md">
                 <div className="flex items-center justify-center mb-1">
                   <Bed className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
                 </div>
@@ -368,7 +445,7 @@ export default function SharedPropertyReportPage() {
               </div>
             )}
             {report.bathrooms && (
-              <div className="bg-gray-50 rounded-lg p-2 sm:p-3 text-center hover:bg-gray-100 transition-colors">
+              <div className="bg-gray-50 rounded-lg p-2 sm:p-3 text-center hover:bg-gray-100 transition-colors shadow-md">
                 <div className="flex items-center justify-center mb-1">
                   <Bath className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
                 </div>
@@ -379,9 +456,9 @@ export default function SharedPropertyReportPage() {
           </div>
 
           {(report.floors || report.buildingAge) && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 mb-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 mb-2">
               {report.floors && (
-                <div className="flex items-center gap-2 bg-blue-50 rounded-lg p-2 sm:p-3 hover:bg-blue-100 transition-colors">
+                <div className="flex items-center gap-2 bg-blue-50 rounded-lg p-2 sm:p-3 hover:bg-blue-100 transition-colors shadow-md">
                   <div className="w-6 h-6 sm:w-8 sm:h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
                     <Layers className="w-3 h-3 sm:w-4 sm:h-4 text-blue-600" />
                   </div>
@@ -392,7 +469,7 @@ export default function SharedPropertyReportPage() {
                 </div>
               )}
               {report.buildingAge && (
-                <div className="flex items-center gap-2 bg-orange-50 rounded-lg p-2 sm:p-3 hover:bg-orange-100 transition-colors">
+                <div className="flex items-center gap-2 bg-orange-50 rounded-lg p-2 sm:p-3 hover:bg-orange-100 transition-colors shadow-md">
                   <div className="w-6 h-6 sm:w-8 sm:h-8 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
                     <CalendarIcon className="w-3 h-3 sm:w-4 sm:h-4 text-orange-600" />
                   </div>
@@ -405,7 +482,7 @@ export default function SharedPropertyReportPage() {
             </div>
           )}
           
-          <div className="flex items-center gap-6 text-sm text-gray-500 pt-4 border-t border-gray-200">
+          <div className="flex items-center gap-6 text-sm text-gray-500 pt-4  border-gray-200">
             <div className="flex items-center gap-1">
               <Calendar className="w-4 h-4" />
               <span>สร้างเมื่อ {new Date(report.createdAt).toLocaleDateString('th-TH')}</span>
@@ -427,14 +504,14 @@ export default function SharedPropertyReportPage() {
 
         {/* Contact */}
         {(report.contactPhone || report.contactEmail || report.contactLine) && (
-          <div className="bg-gradient-to-r from-blue-50 to-green-50 rounded-lg p-2 sm:p-3 mb-4 border border-blue-200">
-            <div className="flex items-center gap-3 mb-3">
+          <div className="bg-gradient-to-r from-blue-50 to-green-50 rounded-lg p-2 sm:p-3 mb-4 border border-blue-200 shadow-lg">
+            <div className="flex items-center gap-3 mb-2">
               <Phone className="w-5 h-5 text-blue-600" />
               <h3 className="font-semibold text-gray-800">ช่องทางการติดต่อ</h3>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {report.contactPhone && (
-                <div className="flex items-center gap-2 bg-white rounded-lg p-3 shadow-sm">
+                <div className="flex items-center gap-2 bg-white rounded-lg p-3 shadow-md">
                   <Phone className="w-4 h-4 text-green-600" />
                   <div>
                     <div className="text-sm text-gray-600">โทรศัพท์</div>
@@ -445,7 +522,7 @@ export default function SharedPropertyReportPage() {
                 </div>
               )}
               {report.contactEmail && (
-                <div className="flex items-center gap-2 bg-white rounded-lg p-3 shadow-sm">
+                <div className="flex items-center gap-2 bg-white rounded-lg p-3 shadow-md">
                   <Mail className="w-4 h-4 text-blue-600" />
                   <div>
                     <div className="text-sm text-gray-600">อีเมล</div>
@@ -456,7 +533,7 @@ export default function SharedPropertyReportPage() {
                 </div>
               )}
               {report.contactLine && (
-                <div className="flex items-center gap-2 bg-white rounded-lg p-3 shadow-sm">
+                <div className="flex items-center gap-2 bg-white rounded-lg p-3 shadow-md">
                   <MessageCircle className="w-4 h-4 text-green-500" />
                   <div>
                     <div className="text-sm text-gray-600">Line</div>
@@ -469,7 +546,7 @@ export default function SharedPropertyReportPage() {
         )}
 
         {/* Location */}
-        <div className="bg-gray-50 rounded-lg p-2 sm:p-3 mb-4">
+        <div className="bg-gray-50 rounded-lg p-2 sm:p-3 mb-4 shadow-lg">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
             <div className="flex items-start gap-3">
               <MapPin className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
@@ -503,7 +580,7 @@ export default function SharedPropertyReportPage() {
         </div>
 
         {/* Nearby Places */}
-        <div className="bg-white rounded-2xl shadow-lg p-2">
+        <div className="bg-white rounded-2xl shadow-sm p-2">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
               <MapPin className="w-5 h-5 text-blue-600" />
@@ -517,7 +594,7 @@ export default function SharedPropertyReportPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {report.nearbyPlaces && report.nearbyPlaces.length > 0 ? (
               report.nearbyPlaces.map((place, index) => (
-                <div key={index} className="bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-all duration-200 group">
+                <div key={index} className="bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-all duration-200 group shadow-md hover:shadow-lg">
                   {/* Place Image */}
                   <div className="mb-4">
                     {(place.primary_photo?.url || place.photos?.[0]?.url || place.photoUrl || place.photo) ? (
@@ -563,7 +640,7 @@ export default function SharedPropertyReportPage() {
             ))
             ) : (
               <div className="col-span-full text-center py-8 text-gray-500">
-                <MapPin className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                <MapPin className="w-12 h-12 mx-auto mb-2 text-gray-300" />
                 <p>ไม่มีข้อมูลสถานที่ใกล้เคียง</p>
               </div>
             )}
@@ -575,7 +652,7 @@ export default function SharedPropertyReportPage() {
           <p className="text-sm">
             สร้างด้วย 🏠 Property Snap • 
             <a href="/property-snap" className="text-blue-600 hover:underline ml-1">
-              สร้างรายงานของคุณ
+              สร้างฟรีที่นี่
             </a>
           </p>
         </div>

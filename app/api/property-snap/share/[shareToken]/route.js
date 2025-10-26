@@ -77,7 +77,8 @@ export async function GET(request, { params }) {
       isPublic: report.isPublic,
       status: report.status,
       user: {
-        name: report.user.name || 'ผู้ใช้'
+        name: report.user.name || 'ผู้ใช้',
+        id: report.userId
       }
     };
 

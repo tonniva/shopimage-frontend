@@ -1,0 +1,178 @@
+import { NextResponse } from 'next/server';
+import { createServerSupabaseAdmin } from '@/utils/supabase/server';
+import { prisma } from '@/lib/prisma';
+
+/**
+ * Update header settings
+ * PATCH /api/property-snap/header/[id]
+ */
+export async function PATCH(request, { params }) {
+  const { id } = await params;
+  
+  try {
+    const supabase = await createServerSupabaseAdmin();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Get user from database
+    const { data: { data: prismaUserData } } = await supabase
+      .from('User')
+      .select('id')
+      .eq('email', user.email)
+      .single();
+
+    if (!prismaUserData) {
+      return NextResponse.json(
+        { error: 'User not found' },
+        { status: 404 }
+      );
+    }
+
+    const userId = prismaUserData.id;
+
+    // Get request body
+    const body = await request.json();
+    const { autoSlide, slideDelay, order } = body;
+
+    // Verify ownership
+    const { data: existingHeader, error: fetchError } = await supabase
+      .from('property_snap_headers')
+      .select('userId')
+      .eq('id', id)
+      .single();
+
+    if (fetchError || !existingHeader) {
+      return NextResponse.json(
+        { error: 'Header not found' },
+        { status: 404 }
+      );
+    }
+
+    if (existingHeader.userId !== userId) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 403 }
+      );
+    }
+
+    // Prepare update data
+    const updateData = {};
+    if (autoSlide !== undefined) updateData.autoSlide = autoSlide;
+    if (slideDelay !== undefined) updateData.slideDelay = slideDelay;
+    if (order !== undefined) updateData.order = order;
+
+    // Update header
+    const { data: updatedHeader, error: updateError } = await supabase
+      .from('property_snap_headers')
+      .update(updateData)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (updateError) {
+      throw updateError;
+    }
+
+    return NextResponse.json({
+      success: true,
+      header: updatedHeader
+    });
+
+  } catch (error) {
+    console.error('Error updating header:', error);
+    return NextResponse.json(
+      { 
+        success: false,
+        error: 'Failed to update header',
+        details: error.message 
+      },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * Delete header
+ * DELETE /api/property-snap/header/[id]
+ */
+export async function DELETE(request, { params }) {
+  const { id } = await params;
+  
+  try {
+    const supabase = await createServerSupabaseAdmin();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Get user from database
+    const { data: { data: prismaUserData } } = await supabase
+      .from('User')
+      .select('id')
+      .eq('email', user.email)
+      .single();
+
+    if (!prismaUserData) {
+      return NextResponse.json(
+        { error: 'User not found' },
+        { status: 404 }
+      );
+    }
+
+    const userId = prismaUserData.id;
+
+    // Verify ownership and get file path
+    const { data: existingHeader, error: fetchError } = await supabase
+      .from('property_snap_headers')
+      .select('path')
+      .eq('id', id)
+      .single();
+
+    if (fetchError || !existingHeader) {
+      return NextResponse.json(
+        { error: 'Header not found' },
+        { status: 404 }
+      );
+    }
+
+    // Delete from storage
+    const { error: storageError } = await supabase.storage
+      .from('shopimage')
+      .remove([existingHeader.path]);
+
+    if (storageError) {
+      console.warn('Storage deletion error:', storageError);
+    }
+
+    // Delete from database
+    const { error: deleteError } = await supabase
+      .from('property_snap_headers')
+      .delete()
+      .eq('id', id);
+
+    if (deleteError) {
+      throw deleteError;
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: 'Header deleted successfully'
+    });
+
+  } catch (error) {
+    console.error('Error deleting header:', error);
+    return NextResponse.json(
+      { 
+        success: false,
+        error: 'Failed to delete header',
+        details: error.message 
+      },
+      { status: 500 }
+    );
+  }
+}
+

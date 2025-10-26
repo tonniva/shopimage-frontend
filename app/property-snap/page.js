@@ -34,6 +34,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import PropertySnapHeaderManager from '@/components/PropertySnapHeaderManager';
 
 export default function PropertySnapMainPage() {
   const { user, ready } = useAuth();
@@ -264,6 +265,9 @@ export default function PropertySnapMainPage() {
             </div>
           </div>
         </div>
+
+        {/* Header Manager - Only show if user is logged in */}
+        {user && <PropertySnapHeaderManager />}
 
         {/* Filters */}
         <div className="mb-8">

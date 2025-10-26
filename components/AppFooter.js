@@ -126,7 +126,7 @@ export default function AppFooter() {
                 href="mailto:tongiggabite@gmail.com"
                 className="block text-center px-4 py-2 border-2 border-black rounded-lg bg-white hover:-translate-y-0.5 hover:shadow-[4px_4px_0_#000] transition-all duration-150 font-semibold text-sm"
               >
-                📧 Email Contact
+                 Email
               </a>
             </div>
           </div>
