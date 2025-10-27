@@ -489,7 +489,16 @@ export default function EditPropertySnapPage() {
       formDataToSend.append('contactEmail', formData.contactEmail);
       formDataToSend.append('contactLine', formData.contactLine);
       
-      // Add new images only
+      // Send all images in order (both existing and new ones)
+      const allImagesData = images.map(img => ({
+        url: img.url || img.preview,
+        alt: img.name || 'Property image',
+        isNew: !!img.file
+      }));
+      
+      formDataToSend.append('imageOrder', JSON.stringify(allImagesData));
+      
+      // Add new images only (for upload)
       images.forEach(image => {
         if (image.file) {
           formDataToSend.append('images', image.file);

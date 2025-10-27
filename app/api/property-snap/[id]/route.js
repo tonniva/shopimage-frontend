@@ -179,6 +179,18 @@ export async function PUT(request, { params }) {
       }
     }
 
+    // Parse image order if provided
+    let imageOrderData = [];
+    const imageOrderString = formData.get('imageOrder');
+    if (imageOrderString) {
+      try {
+        imageOrderData = JSON.parse(imageOrderString);
+        console.log('📸 Received image order:', imageOrderData.length, 'images');
+      } catch (e) {
+        console.error('Error parsing image order:', e);
+      }
+    }
+
     const updates = {
       title: formData.get('title') || undefined,
       description: formData.get('description') || undefined,
@@ -255,6 +267,34 @@ export async function PUT(request, { params }) {
 
     let updatedImages = existingImages;
 
+    // If image order is provided, reorder images according to the new order
+    if (imageOrderData.length > 0) {
+      console.log('🔄 Reordering images according to provided order');
+      
+      // Map of existing images by URL
+      const existingImagesMap = new Map();
+      if (Array.isArray(existingImages)) {
+        existingImages.forEach((img, idx) => {
+          const url = typeof img === 'string' ? img : img.url;
+          existingImagesMap.set(url, img);
+        });
+      }
+      
+      // Build ordered images array from imageOrderData
+      updatedImages = imageOrderData.map(imgOrder => {
+        // If it's marked as new, it will be uploaded later
+        if (imgOrder.isNew) {
+          return { url: imgOrder.url, alt: imgOrder.alt };
+        }
+        // Otherwise, use existing image data
+        const url = imgOrder.url;
+        const existingImg = existingImagesMap.get(url);
+        return existingImg || { url: url, alt: imgOrder.alt };
+      });
+      
+      console.log('✅ Reordered images:', updatedImages.length);
+    }
+
     if (imageFiles.length > 0) {
       // Upload new images to Supabase storage
       const uploadedUrls = [];
@@ -290,7 +330,29 @@ export async function PUT(request, { params }) {
         }
       }
 
-      updatedImages = [...existingImages, ...uploadedUrls];
+      // If image order is provided, replace new image URLs in the ordered array
+      if (imageOrderData.length > 0) {
+        console.log('🔄 Replacing new image URLs in ordered array');
+        let uploadIndex = 0;
+        updatedImages = updatedImages.map(img => {
+          // Check if this was marked as new
+          const imgOrder = imageOrderData.find(io => io.url === img.url || io.url === img);
+          if (imgOrder && imgOrder.isNew && uploadIndex < uploadedUrls.length) {
+            const newImg = uploadedUrls[uploadIndex];
+            uploadIndex++;
+            return { url: newImg.url, alt: newImg.alt };
+          }
+          return img;
+        });
+        
+        // Add any remaining uploaded images at the end if there are more uploads than new images
+        if (uploadIndex < uploadedUrls.length) {
+          updatedImages = [...updatedImages, ...uploadedUrls.slice(uploadIndex)];
+        }
+      } else {
+        // No image order provided, just append new images
+        updatedImages = [...existingImages, ...uploadedUrls];
+      }
     }
 
     // Update the report
