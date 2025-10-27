@@ -1,11 +1,12 @@
-import prisma from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 
 export default async function sitemap() {
   try {
     // Fetch all approved properties
-    const properties = await prisma.propertySnap.findMany({
+    const properties = await prisma.propertyReport.findMany({
       where: {
-        status: 'approved'
+        status: 'approved',
+        isPublic: true
       },
       select: {
         shareToken: true,
