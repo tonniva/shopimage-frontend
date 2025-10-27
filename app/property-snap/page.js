@@ -246,7 +246,7 @@ export default function PropertySnapMainPage() {
           {/* Content */}
           <div className="relative z-10 py-12 sm:py-16 px-4 sm:px-6">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4" style={{ textShadow: '3px 3px 6px rgba(0, 0, 0, 0.9)' }}>
-              สร้าง Link แชร์รายงานอสังหาริมทรัพย์ของคุณ
+              สร้าง Link แชร์ อสังหาริมทรัพย์ของคุณ
             </h2>
             <p className="text-lg sm:text-xl text-gray-200 mb-6 sm:mb-8 max-w-3xl mx-auto" style={{ textShadow: '1px 1px 2px rgba(0, 0, 0, 0.6)' }}>
               ดูภาพรวมสถานที่ใกล้เคียง ราคา และข้อมูลสำคัญในที่เดียว

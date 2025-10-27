@@ -347,7 +347,7 @@ export default function SharedPropertyReportPage() {
                 <div className="absolute inset-0 bg-black/30"></div>
                 <div className="relative z-10 text-center text-white px-6">
                   <Home className="w-16 h-16 mx-auto mb-4" />
-                  <h1 className="text-2xl font-bold mb-2">สร้าง Link แชร์รายงานอสังหาริมทรัพย์ของคุณ</h1>
+                  <h1 className="text-2xl font-bold mb-2">สร้าง Link แชร์ อสังหาริมทรัพย์ของคุณ</h1>
                   <p className="text-lg">ลงฟรี ขาย อสังหาริมทรัพย์ ของคุณ</p>
                   <a href="/property-snap" className="mt-4 inline-block bg-white text-blue-600 px-6 py-2 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
                     สร้างฟรี
