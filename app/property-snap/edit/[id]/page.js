@@ -2,6 +2,22 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/components/AuthProvider';
 import { useRouter, useParams } from 'next/navigation';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { 
   Camera, 
   MapPin, 
@@ -16,7 +32,9 @@ import {
   Star,
   Phone,
   Edit,
-  Trash2
+  Trash2,
+  ArrowUp,
+  ArrowDown
 } from 'lucide-react';
 import { trackPropertySnap, trackEvent, EVENTS, CATEGORIES } from '@/lib/analytics';
 import { validateImageFile, compressImages, formatFileSize } from '@/utils/image-utils';
@@ -37,11 +55,90 @@ const getPlaceIcon = (type) => {
   }
 };
 
+// Sortable Image Item Component
+function SortableImageItem({ image, index, totalImages, onMoveUp, onMoveDown, onRemove }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: image.id || image.url });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} className="relative group">
+      <div className="aspect-square rounded-lg overflow-hidden bg-gray-200">
+        <img
+          src={image.preview || image.url}
+          alt={image.name || 'Property image'}
+          className="w-full h-full object-cover"
+        />
+      </div>
+      
+      {/* Image Order Badge */}
+      <div className="absolute top-2 left-2 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-full z-10">
+        #{index + 1}
+      </div>
+      
+      {/* Control Buttons */}
+      <div className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity space-y-1 z-20">
+        <button
+          onClick={() => onMoveUp(index)}
+          disabled={index === 0}
+          className="bg-blue-500 text-white rounded-full p-1.5 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-600 transition-colors"
+          title="เลื่อนขึ้น"
+        >
+          <ArrowUp className="h-4 w-4" />
+        </button>
+        <button
+          onClick={() => onMoveDown(index)}
+          disabled={index === totalImages - 1}
+          className="bg-indigo-500 text-white rounded-full p-1.5 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-indigo-600 transition-colors"
+          title="เลื่อนลง"
+        >
+          <ArrowDown className="h-4 w-4" />
+        </button>
+        <button
+          onClick={() => onRemove(image.id || image.url)}
+          className="bg-red-500 text-white rounded-full p-1.5 hover:bg-red-600 transition-colors"
+          title="ลบรูป"
+        >
+          <X className="h-4 w-4" />
+        </button>
+      </div>
+
+      {/* Drag Handle */}
+      <div
+        {...attributes}
+        {...listeners}
+        className="absolute bottom-2 left-2 bg-gray-900/70 text-white px-2 py-1 rounded-full text-xs font-semibold cursor-grab active:cursor-grabbing hover:bg-gray-900"
+      >
+        ⋮⋮ ลากเพื่อเรียงลำดับ
+      </div>
+    </div>
+  );
+}
+
 export default function EditPropertySnapPage() {
   const { user, ready } = useAuth();
   const router = useRouter();
   const params = useParams();
   const { id } = params;
+  
+  // Drag & Drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
   
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -175,8 +272,46 @@ export default function EditPropertySnapPage() {
     }
   };
 
-  const removeImage = (index) => {
-    setImages(prev => prev.filter((_, i) => i !== index));
+  const removeImage = (indexOrId) => {
+    // Support both index and id
+    const imageToRemove = typeof indexOrId === 'number' 
+      ? images[indexOrId] 
+      : images.find(img => img.id === indexOrId || img.url === indexOrId);
+    
+    if (imageToRemove) {
+      setImages(prev => prev.filter(img => img !== imageToRemove));
+    } else {
+      // Fallback to index
+      setImages(prev => prev.filter((_, i) => i !== indexOrId));
+    }
+  };
+
+  const moveImageUp = (index) => {
+    if (index === 0) return;
+    const updatedImages = [...images];
+    [updatedImages[index - 1], updatedImages[index]] = [updatedImages[index], updatedImages[index - 1]];
+    setImages(updatedImages);
+  };
+
+  const moveImageDown = (index) => {
+    if (index === images.length - 1) return;
+    const updatedImages = [...images];
+    [updatedImages[index], updatedImages[index + 1]] = [updatedImages[index + 1], updatedImages[index]];
+    setImages(updatedImages);
+  };
+
+  // Handle drag end event
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+
+    if (active.id !== over.id) {
+      setImages((items) => {
+        const oldIndex = items.findIndex((item) => (item.id || item.url) === active.id);
+        const newIndex = items.findIndex((item) => (item.id || item.url) === over.id);
+
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
   };
 
   const openImagePreview = (index) => {
@@ -377,10 +512,29 @@ export default function EditPropertySnapPage() {
           router.push(`/share/${result.shareToken}`);
         }, 2000);
       } else {
-        const errorData = await response.json();
+        // Try to parse error response, but handle empty/invalid response
+        let errorData;
+        const contentType = response.headers.get('content-type');
+        
+        try {
+          if (contentType && contentType.includes('application/json')) {
+            const text = await response.text();
+            errorData = text ? JSON.parse(text) : {};
+          } else {
+            const text = await response.text();
+            errorData = text ? { error: text, details: text } : { error: 'Unknown error' };
+          }
+        } catch (parseError) {
+          console.error('Failed to parse error response:', parseError);
+          errorData = { 
+            error: `HTTP ${response.status}: ${response.statusText}`, 
+            details: 'Failed to parse error response' 
+          };
+        }
+        
         console.error('API Error:', errorData);
         
-        const errorMessage = errorData.details || errorData.error || 'Unknown error';
+        const errorMessage = errorData.details || errorData.error || `HTTP ${response.status} error`;
         const errorType = errorData.type || 'Error';
         
         throw new Error(`${errorType}: ${errorMessage}`);
@@ -521,33 +675,34 @@ export default function EditPropertySnapPage() {
             </div>
           </div>
 
-          {/* Current Images */}
+          {/* Current Images with Drag & Drop */}
           {images.length > 0 && (
             <div>
               <h3 className="text-sm font-medium text-gray-700 mb-3">รูปภาพปัจจุบัน</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {images.map((image, index) => (
-                  <div key={index} className="relative group">
-                    <div className="aspect-square rounded-lg overflow-hidden bg-gray-100">
-                      <img
-                        src={image.preview || image.url}
-                        alt={`Image ${index + 1}`}
-                        className="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
-                        onClick={() => openImagePreview(index)}
+              <DndContext
+                sensors={sensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleDragEnd}
+              >
+                <SortableContext
+                  items={images.map(img => img.id || img.url)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {images.map((image, index) => (
+                      <SortableImageItem
+                        key={image.id || image.url}
+                        image={image}
+                        index={index}
+                        totalImages={images.length}
+                        onMoveUp={moveImageUp}
+                        onMoveDown={moveImageDown}
+                        onRemove={removeImage}
                       />
-                    </div>
-                    <button
-                      onClick={() => removeImage(index)}
-                      className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                    <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
-                      {formatFileSize(image.size)}
-                    </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                </SortableContext>
+              </DndContext>
             </div>
           )}
         </div>
@@ -567,7 +722,7 @@ export default function EditPropertySnapPage() {
               </label>
               <input
                 type="text"
-                value={formData.title}
+                value={formData.title || ''}
                 onChange={(e) => setFormData({...formData, title: e.target.value})}
                 placeholder="เช่น บ้านเดี่ยว 2 ชั้น สวยงาม"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -580,7 +735,7 @@ export default function EditPropertySnapPage() {
                 คำอธิบาย
               </label>
               <textarea
-                value={formData.description}
+                value={formData.description || ''}
                 onChange={(e) => setFormData({...formData, description: e.target.value})}
                 placeholder="อธิบายรายละเอียดของอสังหาริมทรัพย์..."
                 rows={4}
@@ -594,7 +749,7 @@ export default function EditPropertySnapPage() {
                 ประเภทอสังหาริมทรัพย์
               </label>
               <select
-                value={formData.propertyType}
+                value={formData.propertyType || ''}
                 onChange={(e) => setFormData({...formData, propertyType: e.target.value})}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
@@ -613,7 +768,7 @@ export default function EditPropertySnapPage() {
                   จังหวัด
                 </label>
                 <select
-                  value={formData.province}
+                  value={formData.province || ''}
                   onChange={(e) => handleProvinceChange(e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
@@ -630,7 +785,7 @@ export default function EditPropertySnapPage() {
                 </label>
                 <input
                   type="text"
-                  value={formData.region}
+                  value={formData.region || ''}
                   readOnly
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600"
                   placeholder="จะแสดงอัตโนมัติเมื่อเลือกจังหวัด"
@@ -687,7 +842,7 @@ export default function EditPropertySnapPage() {
               </label>
               <input
                 type="number"
-                value={formData.price}
+                value={formData.price || ''}
                 onChange={(e) => setFormData({...formData, price: e.target.value})}
                 placeholder="เช่น 5000000"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -702,7 +857,7 @@ export default function EditPropertySnapPage() {
                 </label>
                 <input
                   type="number"
-                  value={formData.area}
+                  value={formData.area || ''}
                   onChange={(e) => setFormData({...formData, area: e.target.value})}
                   placeholder="เช่น 120"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -714,7 +869,7 @@ export default function EditPropertySnapPage() {
                 </label>
                 <input
                   type="number"
-                  value={formData.landArea}
+                  value={formData.landArea || ''}
                   onChange={(e) => setFormData({...formData, landArea: e.target.value})}
                   placeholder="เช่น 50"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -730,7 +885,7 @@ export default function EditPropertySnapPage() {
                 </label>
                 <input
                   type="number"
-                  value={formData.bedrooms}
+                  value={formData.bedrooms || ''}
                   onChange={(e) => setFormData({...formData, bedrooms: e.target.value})}
                   placeholder="3"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -742,7 +897,7 @@ export default function EditPropertySnapPage() {
                 </label>
                 <input
                   type="number"
-                  value={formData.bathrooms}
+                  value={formData.bathrooms || ''}
                   onChange={(e) => setFormData({...formData, bathrooms: e.target.value})}
                   placeholder="2"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -754,7 +909,7 @@ export default function EditPropertySnapPage() {
                 </label>
                 <input
                   type="number"
-                  value={formData.floors}
+                  value={formData.floors || ''}
                   onChange={(e) => setFormData({...formData, floors: e.target.value})}
                   placeholder="2"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -766,7 +921,7 @@ export default function EditPropertySnapPage() {
                 </label>
                 <input
                   type="number"
-                  value={formData.buildingAge}
+                  value={formData.buildingAge || ''}
                   onChange={(e) => setFormData({...formData, buildingAge: e.target.value})}
                   placeholder="5"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -787,7 +942,7 @@ export default function EditPropertySnapPage() {
                   </label>
                   <input
                     type="tel"
-                    value={formData.contactPhone}
+                    value={formData.contactPhone || ''}
                     onChange={(e) => setFormData({...formData, contactPhone: e.target.value})}
                     placeholder="เช่น 081-234-5678"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -799,7 +954,7 @@ export default function EditPropertySnapPage() {
                   </label>
                   <input
                     type="email"
-                    value={formData.contactEmail}
+                    value={formData.contactEmail || ''}
                     onChange={(e) => setFormData({...formData, contactEmail: e.target.value})}
                     placeholder="เช่น example@email.com"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -811,7 +966,7 @@ export default function EditPropertySnapPage() {
                   </label>
                   <input
                     type="text"
-                    value={formData.contactLine}
+                    value={formData.contactLine || ''}
                     onChange={(e) => setFormData({...formData, contactLine: e.target.value})}
                     placeholder="เช่น @username"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"

@@ -2,6 +2,22 @@
 import { useState, useRef } from 'react';
 import { useAuth } from '@/components/AuthProvider';
 import { useRouter } from 'next/navigation';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { 
   Camera, 
   MapPin, 
@@ -14,7 +30,9 @@ import {
   AlertCircle,
   CheckCircle,
   Star,
-  Phone
+  Phone,
+  ArrowUp,
+  ArrowDown
 } from 'lucide-react';
 import { trackPropertySnap, trackEvent, EVENTS, CATEGORIES } from '@/lib/analytics';
 import { useImageProcessing } from '@/hooks/useImageProcessing';
@@ -52,6 +70,82 @@ const getPlaceIcon = (type) => {
   }
 };
 
+// Sortable Image Item Component
+function SortableImageItem({ image, index, totalImages, onMoveUp, onMoveDown, onRemove, formatFileSize }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: image.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} className="relative group">
+      <div className="aspect-square rounded-lg overflow-hidden bg-gray-100 border-2 border-dashed border-gray-300">
+        <img
+          src={image.preview}
+          alt={image.name}
+          className="w-full h-full object-cover"
+        />
+      </div>
+      
+      {/* Image Order Badge */}
+      <div className="absolute top-2 left-2 bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-full z-10">
+        #{index + 1}
+      </div>
+      
+      {/* Control Buttons */}
+      <div className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity space-y-1 z-20">
+        <button
+          onClick={() => onMoveUp(index)}
+          disabled={index === 0}
+          className="bg-blue-500 text-white rounded-full p-1.5 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-600 transition-colors"
+          title="เลื่อนขึ้น"
+        >
+          <ArrowUp className="h-4 w-4" />
+        </button>
+        <button
+          onClick={() => onMoveDown(index)}
+          disabled={index === totalImages - 1}
+          className="bg-indigo-500 text-white rounded-full p-1.5 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-indigo-600 transition-colors"
+          title="เลื่อนลง"
+        >
+          <ArrowDown className="h-4 w-4" />
+        </button>
+        <button
+          onClick={() => onRemove(image.id)}
+          className="bg-red-500 text-white rounded-full p-1.5 hover:bg-red-600 transition-colors"
+          title="ลบรูป"
+        >
+          <X className="h-4 w-4" />
+        </button>
+      </div>
+
+      {/* Drag Handle */}
+      <div
+        {...attributes}
+        {...listeners}
+        className="absolute bottom-2 left-2 bg-gray-900/70 text-white px-2 py-1 rounded-full text-xs font-semibold cursor-grab active:cursor-grabbing hover:bg-gray-900"
+      >
+        ⋮⋮ ลากเพื่อเรียงลำดับ
+      </div>
+
+      <div className="mt-2 text-xs text-gray-600">
+        <p className="truncate">{image.name}</p>
+        <p>{formatFileSize(image.size)}</p>
+      </div>
+    </div>
+  );
+}
+
 export default function CreatePropertySnapPage() {
   const { user, ready } = useAuth();
   const router = useRouter();
@@ -59,6 +153,14 @@ export default function CreatePropertySnapPage() {
   // Form states
   const [step, setStep] = useState(1);
   const [images, setImages] = useState([]);
+  
+  // Drag & Drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
   const [location, setLocation] = useState(null);
   const [nearbyPlaces, setNearbyPlaces] = useState([]);
   const [customLat, setCustomLat] = useState('');
@@ -182,6 +284,34 @@ export default function CreatePropertySnapPage() {
   const removeImage = (id) => {
     const updatedImages = images.filter(img => img.id !== id);
     setImages(updatedImages);
+  };
+
+  const moveImageUp = (index) => {
+    if (index === 0) return; // Already at top
+    const updatedImages = [...images];
+    [updatedImages[index - 1], updatedImages[index]] = [updatedImages[index], updatedImages[index - 1]];
+    setImages(updatedImages);
+  };
+
+  const moveImageDown = (index) => {
+    if (index === images.length - 1) return; // Already at bottom
+    const updatedImages = [...images];
+    [updatedImages[index], updatedImages[index + 1]] = [updatedImages[index + 1], updatedImages[index]];
+    setImages(updatedImages);
+  };
+
+  // Handle drag end event
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+
+    if (active.id !== over.id) {
+      setImages((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
   };
 
   const formatFileSize = (bytes) => {
@@ -437,12 +567,23 @@ export default function CreatePropertySnapPage() {
         console.log('API Response statusText:', response.statusText);
         
         let errorData;
+        const contentType = response.headers.get('content-type');
+        
         try {
-          errorData = await response.json();
+          if (contentType && contentType.includes('application/json')) {
+            const text = await response.text();
+            errorData = text ? JSON.parse(text) : {};
+          } else {
+            const text = await response.text();
+            errorData = text ? { error: text, details: text } : { error: 'Unknown error' };
+          }
           console.log('API Error Data:', errorData);
-        } catch (jsonError) {
-          console.error('Failed to parse error response as JSON:', jsonError);
-          errorData = { error: 'Failed to parse error response' };
+        } catch (parseError) {
+          console.error('Failed to parse error response:', parseError);
+          errorData = { 
+            error: `HTTP ${response.status}: ${response.statusText}`, 
+            details: 'Failed to parse error response' 
+          };
         }
         
         console.error('API Error:', errorData);
@@ -577,33 +718,33 @@ export default function CreatePropertySnapPage() {
                 </div>
               </div>
 
-              {/* Image Preview Grid */}
+              {/* Image Preview Grid with Drag & Drop */}
               {images.length > 0 && (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
-                  {images.map((image) => (
-                    <div key={image.id} className="relative group">
-                      <div className="aspect-square rounded-lg overflow-hidden bg-gray-100">
-                        <img
-                          src={image.preview}
-                          alt={image.name}
-                          className="w-full h-full object-cover"
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext
+                    items={images.map((img) => img.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
+                      {images.map((image, index) => (
+                        <SortableImageItem
+                          key={image.id}
+                          image={image}
+                          index={index}
+                          totalImages={images.length}
+                          onMoveUp={moveImageUp}
+                          onMoveDown={moveImageDown}
+                          onRemove={removeImage}
+                          formatFileSize={formatFileSize}
                         />
-                      </div>
-                      
-                      <button
-                        onClick={() => removeImage(image.id)}
-                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-
-                      <div className="mt-2 text-xs text-gray-600">
-                        <p className="truncate">{image.name}</p>
-                        <p>{formatFileSize(image.size)}</p>
-                      </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  </SortableContext>
+                </DndContext>
               )}
 
               <div className="flex justify-end">

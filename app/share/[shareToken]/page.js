@@ -318,7 +318,7 @@ export default function SharedPropertyReportPage() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-4">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Main Content - 9 columns */}
           <div className="lg:col-span-9 space-y-6">
@@ -765,13 +765,7 @@ export default function SharedPropertyReportPage() {
                                             : 'ไม่ระบุ'
                                       }
                                     </span>
-                                  </div>
-                                  {place.rating && (
-                                    <div className="flex items-center text-xs font-bold text-orange-600 bg-orange-50 px-2 py-1 rounded-full w-fit">
-                                      <Star className="w-3 h-3 mr-1 fill-current" />
-                                      <span>{place.rating}</span>
-                                    </div>
-                                  )}
+                                  </div> 
                                 </div>
                               </div>
                             </div>
@@ -800,7 +794,7 @@ export default function SharedPropertyReportPage() {
                   </div>
                   <div>
                     <p className="text-gray-700 font-semibold mb-2">
-                      สร้างด้วย <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 font-bold">Property Snap</span>
+                      สร้าง Link แบบนี้ด้วย  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 font-bold">Property Snap</span>
                     </p>
                     <a 
                       href="/property-snap" 
