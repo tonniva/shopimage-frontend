@@ -47,6 +47,16 @@ body {
   animation: shimmer 1.5s ease-in-out infinite;
 }
 
+/* Hide scrollbar */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}
+
 /* Shimmer shine effect like the video */
 @keyframes shimmer-slide {
   0% {

@@ -17,7 +17,7 @@ import {
   Map,
   ShoppingBag,
   Briefcase,
-  DollarSign,
+  Coins,
   Square,
   TreePine,
   Bed,
@@ -25,7 +25,11 @@ import {
   Layers,
   Calendar as CalendarIcon,
   Mail,
-  MessageCircle
+  MessageCircle,
+  CheckCircle,
+  AlertCircle,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import Swal from 'sweetalert2';
 import { trackPropertySnap } from '@/lib/analytics';
@@ -46,6 +50,9 @@ export default function SharedPropertyReportPage() {
   const [headers, setHeaders] = useState([]);
   const [currentHeaderIndex, setCurrentHeaderIndex] = useState(0);
   const [headerSettings, setHeaderSettings] = useState({ autoSlide: true, slideDelay: 5000 });
+  
+  // Nearby places carousel state
+  const [nearbyPlacesIndex, setNearbyPlacesIndex] = useState(0);
 
   const fetchReport = useCallback(async () => {
     try {
@@ -143,10 +150,10 @@ export default function SharedPropertyReportPage() {
 
   const getListingTypeIcon = (type) => {
     switch (type) {
-      case 'sale': return DollarSign;
+      case 'sale': return Coins;
       case 'rent': return Clock;
-      case 'both': return DollarSign;
-      default: return DollarSign;
+      case 'both': return Coins;
+      default: return Coins;
     }
   };
 
@@ -440,11 +447,31 @@ export default function SharedPropertyReportPage() {
 
         {/* Property Overview */}
         <div className="bg-white rounded-2xl shadow-sm p-2 mb-3">
+          {/* Property Type Badge */}
+          {report.propertyType && (
+            <div className="mb-4">
+              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white px-4 py-2 rounded-full shadow-md">
+                {(() => {
+                  const Icon = getPropertyTypeIcon(report.propertyType);
+                  return <Icon className="w-4 h-4" />;
+                })()}
+                <span className="font-semibold capitalize text-sm">
+                  {report.propertyType === 'house' && 'บ้าน'}
+                  {report.propertyType === 'condo' && 'คอนโด'}
+                  {report.propertyType === 'land' && 'ที่ดิน'}
+                  {report.propertyType === 'commercial' && 'เชิงพาณิชย์'}
+                  {report.propertyType === 'office' && 'ออฟฟิศ'}
+                  {!['house', 'condo', 'land', 'commercial', 'office'].includes(report.propertyType) && report.propertyType}
+                </span>
+              </div>
+            </div>
+          )}
+          
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
               {report.title}
             </h1>
-            <p className="text-gray-600 leading-relaxed text-lg whitespace-pre-wrap break-keep">
+            <p className="text-gray-600 leading-relaxed text-lg whitespace-pre-wrap break-keep p-2">
               {report.description}
             </p>
           </div>
@@ -455,7 +482,7 @@ export default function SharedPropertyReportPage() {
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="w-12 h-12  rounded-full flex items-center justify-center">
-                    <DollarSign className="w-6 h-6 text-blue-600" />
+                    <Coins className="w-6 h-6 text-blue-600" />
                   </div>
                   <div>
                   <div className="text-sm text-gray-600">
@@ -549,22 +576,46 @@ export default function SharedPropertyReportPage() {
             </div>
           )}
           
-          <div className="flex items-center gap-6 text-sm text-gray-500 pt-4  border-gray-200">
-            <div className="flex items-center gap-1">
-              <Calendar className="w-4 h-4" />
-              <span>สร้างเมื่อ {new Date(report.createdAt).toLocaleDateString('th-TH')}</span>
+          {/* Metadata and Verification Section */}
+          <div className="mb-4">
+            <div className="flex flex-wrap items-center gap-3 mb-3">
+              <div className="flex items-center gap-2 bg-green-50 px-3 py-1.5 rounded-full border border-green-200">
+                <CheckCircle className="w-4 h-4 text-green-600" />
+                <span className="text-xs font-medium text-green-700">ข้อมูลได้รับการตรวจสอบ</span>
+              </div>
+              <div className="flex items-center gap-1 text-xs text-gray-500">
+                <Eye className="w-3 h-3" />
+                <span>ดูแล้ว {(report.viewCount || 0).toLocaleString()} ครั้ง</span>
+              </div>
+              <div className="flex items-center gap-1 text-xs text-gray-500">
+                <Share2 className="w-3 h-3" />
+                <span>แชร์แล้ว {(report.shareCount || 0).toLocaleString()} ครั้ง</span>
+              </div>
             </div>
-            <div className="flex items-center gap-1">
-              <Eye className="w-4 h-4" />
-              <span>{report.viewCount} ครั้ง</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Share2 className="w-4 h-4" />
-              <span>{report.shareCount} แชร์</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <User className="w-4 h-4" />
-              <span>โดย {report.user?.name || 'ผู้ใช้'}</span>
+            
+            <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500">
+              <div className="flex items-center gap-1">
+                <Calendar className="w-3 h-3" />
+                <span>สร้างเมื่อ {new Date(report.createdAt).toLocaleDateString('th-TH', { 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })}</span>
+              </div>
+              {report.updatedAt && (
+                <div className="flex items-center gap-1">
+                  <Clock className="w-3 h-3" />
+                  <span>อัปเดตล่าสุด: {new Date(report.updatedAt).toLocaleDateString('th-TH', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                  })}</span>
+                </div>
+              )}
+              <div className="flex items-center gap-1">
+                <User className="w-3 h-3" />
+                <span>โดย {report.user?.name || 'ผู้ใช้'}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -609,6 +660,16 @@ export default function SharedPropertyReportPage() {
                 </div>
               )}
             </div>
+            
+            {/* Safety Warning */}
+            <div className="mt-3 bg-red-50 border border-red-200 rounded-lg p-3">
+              <div className="flex items-start gap-2">
+                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <div className="text-xs text-gray-700">
+                  <span className="font-semibold text-red-900">⚠️ ระวัง:</span> ตรวจสอบข้อมูลก่อนทำธุรกรรม และระวังการโอนเงินล่วงหน้า
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
@@ -648,70 +709,136 @@ export default function SharedPropertyReportPage() {
 
         {/* Nearby Places */}
         <div className="bg-white rounded-2xl shadow-sm p-2">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-              <MapPin className="w-5 h-5 text-blue-600" />
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                <MapPin className="w-5 h-5 text-blue-600" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">สถานที่ใกล้เคียง</h2>
+                <p className="text-sm text-gray-500">สถานที่สำคัญรอบๆ พื้นที่</p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-xl font-bold text-gray-900">สถานที่ใกล้เคียง</h2>
-              <p className="text-sm text-gray-500">สถานที่สำคัญรอบๆ พื้นที่</p>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-            {report.nearbyPlaces && report.nearbyPlaces.length > 0 ? (
-              report.nearbyPlaces.map((place, index) => (
-                <div key={index} className="bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-all duration-200 group shadow-md hover:shadow-lg">
-                  {/* Place Image */}
-                  <div className="mb-4">
-                    {(place.primary_photo?.url || place.photos?.[0]?.url || place.photoUrl || place.photo) ? (
-                      <div className="aspect-video rounded-lg overflow-hidden bg-gray-200">
-                        <img
-                          src={place.primary_photo?.url || place.photos?.[0]?.url || place.photoUrl || place.photo}
-                          alt={place.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          onError={(e) => {
-                            e.currentTarget.src = PlaceholderThumb;
-                          }}
-                        />
-                      </div>
-                    ) : (
-                      <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center">
-                        <span className="text-3xl">{getPlaceIcon(place.type || place.primary_type)}</span>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-2 line-clamp-2 text-sm leading-tight">{place.name}</h4>
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center text-sm text-blue-600 font-medium">
-                        <MapPin className="w-4 h-4 mr-1 flex-shrink-0" />
-                        <span className="truncate">
-                          {typeof place.distance === 'number' 
-                            ? `${(place.distance / 1000).toFixed(1)} กม.`
-                            : (place.distance || (place.distanceKm ? `${place.distanceKm} กม.` : 'ไม่ระบุระยะทาง'))
-                          }
-                        </span>
-                      </div>
-                      {place.rating && (
-                        <div className="flex items-center text-sm text-yellow-600">
-                          <Star className="w-4 h-4 mr-1 fill-current" />
-                          <span className="font-medium">{place.rating}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-            ))
-            ) : (
-              <div className="col-span-full text-center py-8 text-gray-500">
-                <MapPin className="w-12 h-12 mx-auto mb-2 text-gray-300" />
-                <p>ไม่มีข้อมูลสถานที่ใกล้เคียง</p>
+            {report.nearbyPlaces && report.nearbyPlaces.length > 0 && (
+              <div className="flex items-center gap-2 bg-blue-50 px-3 py-1.5 rounded-full border border-blue-200">
+                <CheckCircle className="w-4 h-4 text-blue-600" />
+                <span className="text-sm font-medium text-blue-700">
+                  {report.nearbyPlaces.length} สถานที่
+                </span>
               </div>
             )}
           </div>
+          
+          {/* Carousel */}
+          {report.nearbyPlaces && report.nearbyPlaces.length > 0 ? (
+            <div className="relative">
+              {/* Scrollable Container */}
+              <div className="overflow-x-auto scrollbar-hide pb-4">
+                <div className="flex gap-4" style={{ scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch' }}>
+                  {report.nearbyPlaces.map((place, index) => (
+                    <div 
+                      key={index} 
+                      className="flex-shrink-0 w-64 sm:w-72 bg-gray-50 rounded-lg p-3 hover:bg-gray-100 transition-all duration-200 group shadow-sm hover:shadow-md cursor-pointer"
+                      style={{ scrollSnapAlign: 'start' }}
+                      onClick={() => openImagePreview(index)}
+                    >
+                      {/* Place Image */}
+                      <div className="mb-2">
+                        {(place.primary_photo?.url || place.photos?.[0]?.url || place.photoUrl || place.photo) ? (
+                          <div className="aspect-video rounded-lg overflow-hidden bg-gray-200">
+                            <img
+                              src={place.primary_photo?.url || place.photos?.[0]?.url || place.photoUrl || place.photo}
+                              alt={place.name}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              onError={(e) => {
+                                e.currentTarget.src = PlaceholderThumb;
+                              }}
+                            />
+                          </div>
+                        ) : (
+                          <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center">
+                            <span className="text-2xl">{getPlaceIcon(place.type || place.primary_type)}</span>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div>
+                        <h4 className="font-semibold text-gray-900 mb-1 line-clamp-2 text-sm leading-tight">{place.name}</h4>
+                        
+                        <div className="flex flex-col gap-1">
+                          <div className="flex items-center text-xs text-blue-600 font-medium">
+                            <MapPin className="w-3 h-3 mr-1 flex-shrink-0" />
+                            <span className="truncate">
+                              {typeof place.distance === 'number' 
+                                ? `${(place.distance / 1000).toFixed(1)} กม.`
+                                : (place.distance || (place.distanceKm ? `${place.distanceKm} กม.` : 'ไม่ระบุระยะทาง'))
+                              }
+                            </span>
+                          </div>
+                          {place.rating && (
+                            <div className="flex items-center text-xs text-yellow-600">
+                              <Star className="w-3 h-3 mr-1 fill-current" />
+                              <span className="font-medium">{place.rating}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              <MapPin className="w-12 h-12 mx-auto mb-2 text-gray-300" />
+              <p>ไม่มีข้อมูลสถานที่ใกล้เคียง</p>
+            </div>
+          )}
+        </div>
+
+        {/* Report Abuse Section */}
+        <div className="flex justify-center mt-6 mb-4">
+          <button
+            className="text-xs text-red-600 hover:text-red-700 flex items-center gap-2 bg-red-50 px-4 py-2 rounded-full border border-red-200 hover:bg-red-100 transition-colors"
+            onClick={() => {
+              Swal.fire({
+                icon: 'warning',
+                title: 'รายงานปัญหา',
+                html: `
+                  <div class="text-left text-sm text-gray-600 space-y-2 mb-4">
+                    <p>คุณต้องการรายงานปัญหากับรายงานนี้หรือไม่?</p>
+                    <div class="bg-yellow-50 border border-yellow-200 rounded p-2 mt-3">
+                      <p class="text-xs">เหตุผลที่อาจรายงาน:</p>
+                      <ul class="list-disc list-inside mt-1 space-y-1 text-xs">
+                        <li>ข้อมูลไม่ถูกต้อง</li>
+                        <li>รูปภาพไม่ตรงกับสถานที่จริง</li>
+                        <li>ราคาไม่เหมาะสม</li>
+                        <li>การติดต่อไม่ได้ผล</li>
+                      </ul>
+                    </div>
+                  </div>
+                `,
+                showCancelButton: true,
+                confirmButtonColor: '#EF4444',
+                cancelButtonColor: '#6B7280',
+                confirmButtonText: 'รายงาน',
+                cancelButtonText: 'ยกเลิก'
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  Swal.fire({
+                    icon: 'success',
+                    title: 'ขอบคุณครับ',
+                    text: 'เราจะตรวจสอบรายงานของคุณในเร็วๆ นี้',
+                    confirmButtonColor: '#10B981',
+                    confirmButtonText: 'ตกลง'
+                  });
+                }
+              });
+            }}
+          >
+            <AlertCircle className="w-4 h-4" />
+            รายงานปัญหา
+          </button>
         </div>
 
         {/* Footer */}
