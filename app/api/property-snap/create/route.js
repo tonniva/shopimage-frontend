@@ -165,7 +165,7 @@ export async function POST(request) {
           viewCount: 0,
           shareCount: 0,
           isPublic: true,
-          status: 'ACTIVE',
+          status: 'PENDING', // New reports start as PENDING and need admin approval
           // New fields
           propertyType: propertyType,
           listingType: listingType,

@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { useAuth } from '@/components/AuthProvider';
 import { 
   CheckCircle, 
   Share2, 
@@ -18,12 +19,21 @@ import { trackPropertySnap, trackEvent, EVENTS, CATEGORIES } from '@/lib/analyti
 export default function PropertySnapSuccessPage() {
   const params = useParams();
   const router = useRouter();
+  const { user, ready } = useAuth();
   const { shareToken } = params;
   
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const [shareUrl, setShareUrl] = useState('');
   const [copied, setCopied] = useState(false);
+
+  // Check authentication
+  useEffect(() => {
+    if (ready && !user) {
+      // User not logged in, redirect to login
+      router.push('/property-snap?login=required');
+    }
+  }, [ready, user, router]);
 
   useEffect(() => {
     if (shareToken) {
@@ -32,18 +42,42 @@ export default function PropertySnapSuccessPage() {
       // Fetch real report data from API
       const fetchReport = async () => {
         try {
-          const response = await fetch(`/api/property-snap/share/${shareToken}`);
+          // First try to get the report ID from shareToken
+          let reportId = null;
           
-          if (response.ok) {
-            const data = await response.json();
-            setReport(data.report);
-            
-            // Track successful report view
-            trackPropertySnap.view(data.report?.id || shareToken);
-          } else {
-            console.error('Failed to fetch report:', response.status);
-            setReport(null);
+          // Try to fetch from share API
+          const shareResponse = await fetch(`/api/property-snap/share/${shareToken}`);
+          
+          if (shareResponse.ok) {
+            const shareData = await shareResponse.json();
+            setReport(shareData.report);
+            setLoading(false);
+            trackPropertySnap.view(shareData.report?.id || shareToken);
+            return;
+          } else if (shareResponse.status === 403) {
+            // Report exists but not approved, fetch by token for status display
+            const tokenResponse = await fetch(`/api/property-snap/by-token/${shareToken}`);
+            if (tokenResponse.ok) {
+              const tokenData = await tokenResponse.json();
+              setReport(tokenData.report);
+              setLoading(false);
+              return;
+            } else if (tokenResponse.status === 403) {
+              // User is not the owner of this report
+              console.error('Forbidden: User is not the owner');
+              setReport(null);
+              setLoading(false);
+              return;
+            } else if (tokenResponse.status === 401) {
+              // User not logged in
+              setReport(null);
+              setLoading(false);
+              return;
+            }
           }
+          
+          console.error('Failed to fetch report:', shareResponse.status);
+          setReport(null);
         } catch (error) {
           console.error('Error fetching report:', error);
           setReport(null);
@@ -126,12 +160,33 @@ export default function PropertySnapSuccessPage() {
     }
   };
 
+  // Show loading or redirect if not authenticated
+  if (!ready || !user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-4xl">🔒</span>
+          </div>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-2">กรุณาเข้าสู่ระบบ</h2>
+          <p className="text-gray-600 mb-6">หน้านี้สำหรับผู้ที่สร้างรายงานเท่านั้น</p>
+          <a
+            href="/property-snap"
+            className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+          >
+            ไปที่หน้าหลัก
+          </a>
+        </div>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <h2 className="text-xl font-semibold text-gray-700 mb-2">กำลังสร้างรายงาน...</h2>
+          <h2 className="text-xl font-semibold text-gray-700 mb-2">กำลังโหลดรายงาน...</h2>
           <p className="text-gray-500">กรุณารอสักครู่</p>
         </div>
       </div>
@@ -141,15 +196,15 @@ export default function PropertySnapSuccessPage() {
   if (!report) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="text-2xl">❌</span>
+        <div className="text-center max-w-md mx-auto px-4">
+          <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-4xl">🚫</span>
           </div>
-          <h2 className="text-xl font-semibold text-gray-700 mb-2">ไม่พบรายงาน</h2>
-          <p className="text-gray-500 mb-4">รายงานอาจถูกลบหรือไม่ถูกต้อง</p>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-2">ไม่สามารถเข้าถึงรายงานนี้</h2>
+          <p className="text-gray-600 mb-6">รายงานนี้ไม่ใช่ของคุณ คุณสามารถเข้าถึงเฉพาะรายงานที่คุณสร้างเท่านั้น</p>
           <button
             onClick={() => router.push('/property-snap')}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+            className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors inline-block"
           >
             กลับไปหน้าหลัก
           </button>
@@ -168,10 +223,16 @@ export default function PropertySnapSuccessPage() {
               <CheckCircle className="w-10 h-10 text-green-600" />
             </div>
             <h1 className="text-3xl font-bold text-gray-800 mb-2">
-              🎉 สร้างรายงานสำเร็จ!
+              {report?.status === 'PENDING' ? '⏳ กำลังรอการอนุมัติ' : 
+               report?.status === 'APPROVED' ? '🎉 สร้างรายงานสำเร็จ!' :
+               report?.status === 'REJECTED' ? '❌ ถูกปฏิเสธ' :
+               '📝 สร้างรายงาน'}
             </h1>
             <p className="text-lg text-gray-600">
-              รายงาน Property Snap ของคุณพร้อมแชร์แล้ว
+              {report?.status === 'PENDING' ? 'รายงานของคุณกำลังรอการอนุมัติจาก admin' :
+               report?.status === 'APPROVED' ? 'รายงาน Property Snap ของคุณพร้อมแชร์แล้ว' :
+               report?.status === 'REJECTED' ? `รายงานถูกปฏิเสธ: ${report.rejectionReason || 'ไม่ระบุเหตุผล'}` :
+               'ระบบกำลังประมวลผล'}
             </p>
           </div>
         </div>
@@ -295,7 +356,8 @@ export default function PropertySnapSuccessPage() {
             )}
           </div>
 
-          {/* Share Section */}
+          {/* Share Section - Only show if approved */}
+          {report?.status === 'APPROVED' && (
           <div className="bg-white rounded-xl shadow-lg p-8">
             <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
               <Share2 className="w-6 h-6 text-blue-600" />
@@ -373,6 +435,7 @@ export default function PropertySnapSuccessPage() {
               </button>
             </div>
           </div>
+          )}
         </div>
       </div>
     </div>

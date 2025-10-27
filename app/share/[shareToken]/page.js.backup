@@ -312,7 +312,7 @@ export default function SharedPropertyReportPage() {
               <h1 className="text-2xl font-bold text-gray-900 mb-3">
                 {report.title}
               </h1>
-              <p className="text-gray-600 leading-relaxed text-lg">
+              <p className="text-gray-600 leading-relaxed text-lg whitespace-pre-wrap break-keep">
                 {report.description}
               </p>
             </div>

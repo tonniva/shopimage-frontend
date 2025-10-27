@@ -30,7 +30,9 @@ import {
   Mail,
   MessageCircle,
   CheckCircle,
-  XCircle
+  XCircle,
+  Clock,
+  AlertCircle
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -355,16 +357,32 @@ export default function PropertySnapMainPage() {
                   
                   {/* Status Badge */}
                   <div className="absolute top-3 right-3">
-                    <div className={`backdrop-blur-sm text-white px-2 py-1 rounded-full text-xs flex items-center gap-1 ${
-                      property.status === 'SOLD' ? 'bg-red-500' : 
-                      property.status === 'ACTIVE' ? 'bg-green-500' : 'bg-gray-500'
-                    }`}>
-                      {property.status === 'SOLD' ? <XCircle className="w-3 h-3" /> : 
-                       property.status === 'ACTIVE' ? <CheckCircle className="w-3 h-3" /> : 
-                       <Eye className="w-3 h-3" />}
-                      <span>{property.status === 'SOLD' ? 'ขายแล้ว' : 
-                             property.status === 'ACTIVE' ? 'ขาย' : 'ไม่ระบุ'}</span>
-                    </div>
+                    {property.status === 'PENDING' ? (
+                      <div className="bg-yellow-500 text-white px-2 py-1 rounded-full text-xs flex items-center gap-1 backdrop-blur-sm">
+                        <Clock className="w-3 h-3" />
+                        <span>รออนุมัติ</span>
+                      </div>
+                    ) : property.status === 'APPROVED' ? (
+                      <div className="bg-green-500 text-white px-2 py-1 rounded-full text-xs flex items-center gap-1 backdrop-blur-sm">
+                        <CheckCircle className="w-3 h-3" />
+                        <span>อนุมัติแล้ว</span>
+                      </div>
+                    ) : property.status === 'REJECTED' ? (
+                      <div className="bg-red-500 text-white px-2 py-1 rounded-full text-xs flex items-center gap-1 backdrop-blur-sm">
+                        <AlertCircle className="w-3 h-3" />
+                        <span>ถูกปฏิเสธ</span>
+                      </div>
+                    ) : property.status === 'SOLD' ? (
+                      <div className="bg-red-500 text-white px-2 py-1 rounded-full text-xs flex items-center gap-1 backdrop-blur-sm">
+                        <XCircle className="w-3 h-3" />
+                        <span>ขายแล้ว</span>
+                      </div>
+                    ) : (
+                      <div className="bg-gray-500 text-white px-2 py-1 rounded-full text-xs flex items-center gap-1 backdrop-blur-sm">
+                        <CheckCircle className="w-3 h-3" />
+                        <span>ขาย</span>
+                      </div>
+                    )}
                   </div>
                   
                   {/* View Count */}
@@ -503,13 +521,30 @@ export default function PropertySnapMainPage() {
 
                   {/* Action Buttons */}
                   <div className="flex gap-2">
-                    <Link
-                      href={`/share/${property.shareToken}`}
-                      className="flex-1 bg-blue-600 text-white text-center py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2"
-                    >
-                      <Share2 className="w-4 h-4" />
-                      ดูรายงาน
-                    </Link>
+                    {property.status === 'APPROVED' ? (
+                      <Link
+                        href={`/share/${property.shareToken}`}
+                        className="flex-1 bg-blue-600 text-white text-center py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2"
+                      >
+                        <Share2 className="w-4 h-4" />
+                        ดูรายงาน
+                      </Link>
+                    ) : property.status === 'PENDING' ? (
+                      <div className="flex-1 bg-yellow-50 text-yellow-700 text-center py-2 px-4 rounded-lg font-medium flex items-center justify-center gap-2">
+                        <Clock className="w-4 h-4" />
+                        กำลังรออนุมัติ
+                      </div>
+                    ) : property.status === 'REJECTED' ? (
+                      <div className="flex-1 bg-red-50 text-red-700 text-center py-2 px-4 rounded-lg font-medium flex items-center justify-center gap-2">
+                        <AlertCircle className="w-4 h-4" />
+                        ถูกปฏิเสธ - แก้ไขข้อมูล
+                      </div>
+                    ) : (
+                      <div className="flex-1 bg-gray-200 text-gray-500 text-center py-2 px-4 rounded-lg font-medium flex items-center justify-center gap-2">
+                        <Eye className="w-4 h-4" />
+                        ไม่สามารถแชร์ได้
+                      </div>
+                    )}
                     <button className="p-2 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors">
                       <Heart className="w-5 h-5" />
                     </button>

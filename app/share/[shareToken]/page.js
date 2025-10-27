@@ -27,6 +27,7 @@ import {
   Mail,
   MessageCircle
 } from 'lucide-react';
+import Swal from 'sweetalert2';
 import { trackPropertySnap } from '@/lib/analytics';
 import ImagePreviewModal from '@/components/ImagePreviewModal';
 
@@ -175,21 +176,45 @@ export default function SharedPropertyReportPage() {
         if (error.name === 'AbortError') return; // ผู้ใช้กดยกเลิก
         try {
           await navigator.clipboard.writeText(url);
-          alert('คัดลอกลิ้งแล้ว!');
+          Swal.fire({
+            icon: 'success',
+            title: 'คัดลอกลิ้งแล้ว!',
+            text: 'ลิงก์ถูกคัดลอกไปยังคลิปบอร์ดแล้ว',
+            confirmButtonColor: '#3B82F6',
+            confirmButtonText: 'ตกลง'
+          });
           trackPropertySnap?.share?.(report.id, 'clipboard_fallback');
         } catch (clipboardError) {
           console.error('Clipboard error:', clipboardError);
-          alert('ไม่สามารถแชร์หรือคัดลอกลิ้งได้');
+          Swal.fire({
+            icon: 'error',
+            title: 'เกิดข้อผิดพลาด',
+            text: 'ไม่สามารถแชร์หรือคัดลอกลิ้งได้',
+            confirmButtonColor: '#EF4444',
+            confirmButtonText: 'ตกลง'
+          });
         }
       }
     } else {
       try {
         await navigator.clipboard.writeText(url);
-        alert('คัดลอกลิ้งแล้ว!');
+        Swal.fire({
+          icon: 'success',
+          title: 'คัดลอกลิ้งแล้ว!',
+          text: 'ลิงก์ถูกคัดลอกไปยังคลิปบอร์ดแล้ว',
+          confirmButtonColor: '#3B82F6',
+          confirmButtonText: 'ตกลง'
+        });
         trackPropertySnap?.share?.(report.id, 'clipboard');
       } catch (error) {
         console.error('Clipboard error:', error);
-        alert('ไม่สามารถคัดลอกลิ้งได้');
+        Swal.fire({
+          icon: 'error',
+          title: 'เกิดข้อผิดพลาด',
+          text: 'ไม่สามารถคัดลอกลิ้งได้',
+          confirmButtonColor: '#EF4444',
+          confirmButtonText: 'ตกลง'
+        });
       }
     }
   };
@@ -218,6 +243,7 @@ export default function SharedPropertyReportPage() {
     );
   }
 
+  // Check if report exists and is approved
   if (error || !report) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 flex items-center justify-center">
@@ -233,6 +259,47 @@ export default function SharedPropertyReportPage() {
           >
             กลับ
           </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Check if report is pending approval
+  if (report.status === 'PENDING') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto px-4">
+          <div className="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-4xl">⏳</span>
+          </div>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-2">รอการอนุมัติ</h2>
+          <p className="text-gray-600 mb-6">รายงานของคุณกำลังรอการอนุมัติจาก admin ก่อนที่จะสามารถแชร์ได้</p>
+          <a
+            href="/property-snap"
+            className="inline-block bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-200"
+          >
+            กลับไปหน้าหลัก
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+  if (report.status === 'REJECTED') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto px-4">
+          <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-4xl">❌</span>
+          </div>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-2">รายงานถูกปฏิเสธ</h2>
+          <p className="text-gray-600 mb-2">{report.rejectionReason || 'รายงานของคุณถูกปฏิเสธ กรุณาตรวจสอบข้อมูลและสร้างใหม่'}</p>
+          <a
+            href="/property-snap"
+            className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+          >
+            กลับไปหน้าหลัก
+          </a>
         </div>
       </div>
     );
@@ -377,7 +444,7 @@ export default function SharedPropertyReportPage() {
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
               {report.title}
             </h1>
-            <p className="text-gray-600 leading-relaxed text-lg">
+            <p className="text-gray-600 leading-relaxed text-lg whitespace-pre-wrap break-keep">
               {report.description}
             </p>
           </div>

@@ -1,35 +1,38 @@
 import { NextResponse } from 'next/server';
+import { createServerSupabase } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
+
+/**
+ * GET /api/property-snap/by-token/[shareToken]
+ * Get a property report by shareToken (for owner to view status even if not approved)
+ * This route checks if the current user is the owner of the report
+ */
 
 export async function GET(request, { params }) {
   try {
     const { shareToken } = await params;
     
-    // Get cache config from database
-    let cacheConfig = await prisma.cacheConfig.findUnique({
-      where: { type: 'share_page' }
-    });
-
-    // If not found, create default
-    if (!cacheConfig) {
-      cacheConfig = await prisma.cacheConfig.create({
-        data: {
-          type: 'share_page',
-          enabled: true,
-          maxAge: 300,
-          staleWhileRevalidate: true
-        }
-      });
+    // Check authentication
+    const supabase = await createServerSupabase();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const cacheMaxAge = cacheConfig.maxAge;
-    const enableCache = cacheConfig.enabled;
+    // Find user in Prisma database
+    const prismaUser = await prisma.user.findUnique({
+      where: { email: user.email }
+    });
+
+    if (!prismaUser) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
     
-    // Fetch report from database
+    // Fetch report from database (without status restriction)
     const report = await prisma.propertyReport.findUnique({
       where: {
-        shareToken: shareToken,
-        isPublic: true
+        shareToken: shareToken
       },
       include: {
         user: {
@@ -45,24 +48,13 @@ export async function GET(request, { params }) {
       return NextResponse.json({ error: 'Report not found' }, { status: 404 });
     }
 
-    // Check if report is approved (only APPROVED reports should be visible publicly)
-    if (report.status !== 'APPROVED') {
+    // Check if the current user is the owner
+    if (report.userId !== prismaUser.id) {
       return NextResponse.json({ 
-        error: 'Report not approved',
-        status: report.status,
-        message: report.status === 'PENDING' 
-          ? 'This report is pending approval' 
-          : report.status === 'REJECTED'
-          ? 'This report was rejected'
-          : 'This report is hidden'
+        error: 'Forbidden',
+        message: 'You can only view your own reports' 
       }, { status: 403 });
     }
-
-    // Update view count
-    await prisma.propertyReport.update({
-      where: { id: report.id },
-      data: { viewCount: report.viewCount + 1 }
-    });
 
     // Transform data for frontend
     const transformedReport = {
@@ -70,6 +62,10 @@ export async function GET(request, { params }) {
       shareToken: report.shareToken,
       title: report.title,
       description: report.description,
+      status: report.status,
+      rejectionReason: report.rejectionReason,
+      reviewedBy: report.reviewedBy,
+      reviewedAt: report.reviewedAt,
       // New property fields
       propertyType: report.propertyType,
       listingType: report.listingType,
@@ -104,34 +100,23 @@ export async function GET(request, { params }) {
       aiInsights: report.aiInsights || null,
       transportation: report.transportation || null,
       createdAt: report.createdAt,
-      viewCount: report.viewCount + 1,
+      updatedAt: report.updatedAt,
+      viewCount: report.viewCount,
       shareCount: report.shareCount,
       isPublic: report.isPublic,
-      status: report.status,
       user: {
         name: report.user.name || 'ผู้ใช้',
         id: report.userId
       }
     };
 
-    // Set cache headers based on config
-    const headers = new Headers();
-    if (enableCache) {
-      const cacheControlValue = cacheConfig.staleWhileRevalidate
-        ? `public, s-maxage=${cacheMaxAge}, stale-while-revalidate=60`
-        : `public, s-maxage=${cacheMaxAge}`;
-      
-      headers.set('Cache-Control', cacheControlValue);
-      headers.set('CDN-Cache-Control', `public, s-maxage=${cacheMaxAge}`);
-    }
-
-    return NextResponse.json(
-      { report: transformedReport },
-      { headers }
-    );
+    return NextResponse.json({
+      report: transformedReport
+    });
 
   } catch (error) {
-    console.error('Error fetching shared report:', error);
+    console.error('Error fetching report by token:', error);
     return NextResponse.json({ error: 'Failed to fetch report' }, { status: 500 });
   }
 }
+
