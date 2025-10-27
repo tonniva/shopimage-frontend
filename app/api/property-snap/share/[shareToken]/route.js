@@ -1,29 +1,67 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { memoryCache } from '@/lib/cache';
 
 export async function GET(request, { params }) {
   try {
     const { shareToken } = await params;
     
-    // Get cache config from database
-    let cacheConfig = await prisma.cacheConfig.findUnique({
-      where: { type: 'share_page' }
-    });
-
-    // If not found, create default
+    // Check in-memory cache for config
+    let cacheConfig = memoryCache.config.get('share_page');
+    
     if (!cacheConfig) {
-      cacheConfig = await prisma.cacheConfig.create({
-        data: {
-          type: 'share_page',
-          enabled: true,
-          maxAge: 300,
-          staleWhileRevalidate: true
-        }
+      // Get cache config from database
+      cacheConfig = await prisma.cacheConfig.findUnique({
+        where: { type: 'share_page' }
       });
+
+      // If not found, create default
+      if (!cacheConfig) {
+        cacheConfig = await prisma.cacheConfig.create({
+          data: {
+            type: 'share_page',
+            enabled: true,
+            maxAge: 300,
+            staleWhileRevalidate: true
+          }
+        });
+      }
+      
+      // Cache config for 10 minutes
+      memoryCache.config.set('share_page', cacheConfig, 600);
     }
 
     const cacheMaxAge = cacheConfig.maxAge;
     const enableCache = cacheConfig.enabled;
+    
+    console.log('🔍 Share API Cache Status:', {
+      enabled: enableCache,
+      maxAge: cacheMaxAge,
+      staleWhileRevalidate: cacheConfig.staleWhileRevalidate,
+      shareToken
+    });
+    
+    // Check in-memory cache for report
+    const cachedReport = memoryCache.report.get(shareToken);
+    if (cachedReport) {
+      console.log('✅ Cache HIT - Returning from memory cache');
+      return NextResponse.json(
+        { report: cachedReport },
+        { 
+          headers: new Headers({
+            'Cache-Control': enableCache 
+              ? (cacheConfig.staleWhileRevalidate
+                  ? `public, s-maxage=${cacheMaxAge}, stale-while-revalidate=60`
+                  : `public, s-maxage=${cacheMaxAge}`)
+              : 'no-cache',
+            'X-Cache': 'HIT',
+            'X-Cache-Source': 'memory'
+          })
+        }
+      );
+    }
+    
+    console.log('❌ Cache MISS - Fetching from database');
     
     // Fetch report from database
     const report = await prisma.propertyReport.findUnique({
@@ -58,22 +96,24 @@ export async function GET(request, { params }) {
       }, { status: 403 });
     }
 
-    // Update view count
-    await prisma.propertyReport.update({
+    // Fetch header images in parallel with view count update (fire-and-forget)
+    const [headerRecords] = await Promise.all([
+      prisma.propertySnapHeader.findMany({
+        where: {
+          userId: report.userId,
+          isActive: true
+        },
+        orderBy: {
+          order: 'asc'
+        }
+      })
+    ]);
+
+    // Update view count asynchronously (fire-and-forget)
+    prisma.propertyReport.update({
       where: { id: report.id },
       data: { viewCount: report.viewCount + 1 }
-    });
-
-    // Fetch header images for this user
-    const headerRecords = await prisma.propertySnapHeader.findMany({
-      where: {
-        userId: report.userId,
-        isActive: true
-      },
-      orderBy: {
-        order: 'asc'
-      }
-    });
+    }).catch(err => console.error('Error updating view count:', err));
 
     const headerImages = headerRecords.map(header => header.url);
 
@@ -137,7 +177,29 @@ export async function GET(request, { params }) {
       
       headers.set('Cache-Control', cacheControlValue);
       headers.set('CDN-Cache-Control', `public, s-maxage=${cacheMaxAge}`);
+      
+      console.log('✅ Cache ENABLED:', {
+        cacheControl: cacheControlValue,
+        cdnControl: `public, s-maxage=${cacheMaxAge}`
+      });
+    } else {
+      console.log('❌ Cache DISABLED');
     }
+
+    console.log('📦 Sending response:', {
+      reportId: report.id,
+      title: report.title,
+      viewCount: report.viewCount,
+      hasHeaders: headerImages.length > 0
+    });
+
+    // Cache the transformed report in memory
+    // Use same TTL as CDN cache
+    memoryCache.report.set(shareToken, transformedReport, cacheMaxAge);
+
+    // Add cache headers
+    headers.set('X-Cache', 'MISS');
+    headers.set('X-Cache-Source', 'database');
 
     return NextResponse.json(
       { report: transformedReport },

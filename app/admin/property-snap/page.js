@@ -940,6 +940,49 @@ export default function AdminPropertySnapPage() {
 
               <div className="flex gap-2 justify-end mt-6">
                 <button
+                  onClick={async () => {
+                    const result = await Swal.fire({
+                      icon: 'question',
+                      title: 'ยืนยันการล้าง Cache',
+                      text: 'คุณแน่ใจหรือไม่ที่จะล้าง Cache สำหรับ Property Snap?',
+                      showCancelButton: true,
+                      confirmButtonColor: '#EF4444',
+                      cancelButtonColor: '#6B7280',
+                      confirmButtonText: 'ล้าง Cache',
+                      cancelButtonText: 'ยกเลิก'
+                    });
+                    
+                    if (result.isConfirmed) {
+                      try {
+                        const response = await fetch('/api/cache/clear', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ type: 'report' })
+                        });
+                        
+                        if (response.ok) {
+                          Swal.fire({
+                            icon: 'success',
+                            title: 'ล้าง Cache สำเร็จ',
+                            text: 'Cache ถูกล้างเรียบร้อยแล้ว',
+                            confirmButtonColor: '#10B981'
+                          });
+                        }
+                      } catch (error) {
+                        Swal.fire({
+                          icon: 'error',
+                          title: 'เกิดข้อผิดพลาด',
+                          text: 'ไม่สามารถล้าง Cache ได้',
+                          confirmButtonColor: '#EF4444'
+                        });
+                      }
+                    }
+                  }}
+                  className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors flex items-center gap-2"
+                >
+                  🧹 ล้าง Cache
+                </button>
+                <button
                   onClick={() => setConfigModal({ open: false })}
                   className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
                 >
