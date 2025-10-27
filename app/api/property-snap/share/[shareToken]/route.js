@@ -64,6 +64,19 @@ export async function GET(request, { params }) {
       data: { viewCount: report.viewCount + 1 }
     });
 
+    // Fetch header images for this user
+    const headerRecords = await prisma.propertySnapHeader.findMany({
+      where: {
+        userId: report.userId,
+        isActive: true
+      },
+      orderBy: {
+        order: 'asc'
+      }
+    });
+
+    const headerImages = headerRecords.map(header => header.url);
+
     // Transform data for frontend
     const transformedReport = {
       id: report.id,
@@ -96,6 +109,7 @@ export async function GET(request, { params }) {
         address: report.address,
         formattedAddress: report.formattedAddress
       },
+      headerImages: headerImages,
       images: report.userImages || [],
       nearbyPlaces: report.nearbyPlaces || [],
       googlePhotos: report.googlePhotos || null,

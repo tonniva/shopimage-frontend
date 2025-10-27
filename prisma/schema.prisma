@@ -28,6 +28,7 @@ model User {
   subscriptions   Subscription?
   usages          UsageLog[]
   propertyHeaders PropertySnapHeader[]
+  advertisements  Advertisement[]
 
   @@schema("public")
 }
@@ -619,6 +620,38 @@ model PropertySnapHeader {
   
   @@index([userId])
   @@index([isActive])
+  @@schema("public")
+}
+
+model Advertisement {
+  id            String   @id @default(cuid())
+  title         String
+  description   String?
+  imageUrl      String
+  link          String?
+  type          String   @default("image") // image, text, banner
+  status        String   @default("inactive") // active, inactive, pending
+  priority      Int      @default(5)
+  weight        Int      @default(1)
+  
+  startDate     DateTime?
+  endDate       DateTime?
+  
+  position      String   @default("sidebar") // sidebar, top, between, footer
+  targetPages   String[] @default([]) // ["property_snap", "pdf", "all"]
+  
+  impressions   Int      @default(0)
+  clicks        Int      @default(0)
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  createdBy     String?
+  
+  user          User?    @relation(fields: [createdBy], references: [id], onDelete: SetNull)
+  
+  @@index([status])
+  @@index([position])
+  @@index([createdAt])
   @@schema("public")
 }
 

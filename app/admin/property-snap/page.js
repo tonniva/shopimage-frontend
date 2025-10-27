@@ -18,7 +18,8 @@ import {
   CheckSquare,
   Square,
   Settings,
-  Save
+  Save,
+  Megaphone
 } from 'lucide-react';
 import Swal from 'sweetalert2';
 import Link from 'next/link';
@@ -343,6 +344,14 @@ export default function AdminPropertySnapPage() {
               </div>
             </div>
             <div className="flex items-center gap-2 w-full sm:w-auto">
+              <Link
+                href="/admin/ads"
+                className="bg-purple-600 text-white px-3 sm:px-4 py-2 rounded-lg font-semibold hover:bg-purple-700 transition-colors flex items-center gap-2 text-sm sm:text-base"
+                title="จัดการโฆษณา"
+              >
+                <Megaphone className="w-4 h-4" />
+                <span className="hidden sm:inline">จัดการโฆษณา</span>
+              </Link>
               <button
                 onClick={() => setConfigModal({ open: true })}
                 className="bg-gray-100 text-gray-700 px-3 sm:px-4 py-2 rounded-lg font-semibold hover:bg-gray-200 transition-colors flex items-center gap-2 text-sm sm:text-base"

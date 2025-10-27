@@ -1,5 +1,7 @@
 User-agent: *
 Allow: /
 Disallow: /api/
+Disallow: /admin/
+Disallow: /dashboard/
 
 Sitemap: https://www.xn--s3cnd3b9cte.com/sitemap.xml
