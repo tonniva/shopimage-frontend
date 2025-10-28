@@ -11,8 +11,7 @@ export default function AuthProvider({ children }) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    let mounted = true;
-debugger
+    let mounted = true; 
     // 1) อ่าน session ทันที (เร็วกว่า getUser ในหลายเคส)
     supabase.auth.getSession().then(({ data }) => {
       if (!mounted) return;
