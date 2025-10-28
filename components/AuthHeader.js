@@ -53,6 +53,33 @@ export function AuthHeader() {
     }
   };
 
+  // Show loading state while auth is not ready
+  if (!ready) {
+    return (
+      <>
+        {/* Auth + Lang */}
+        <div className="flex items-center gap-2 md:gap-3 w-full md:w-auto justify-end">
+          {/* Language Switch */}
+          <Link
+            href={switchHref}
+            className="px-3 py-2 border-2 border-black rounded-lg text-xs md:text-sm font-semibold bg-white hover:bg-gray-50 hover:-translate-y-0.5 hover:shadow-[4px_4px_0_#000] active:translate-y-0 active:shadow-[2px_2px_0_#000] transition-all duration-150"
+            aria-label="Switch language"
+            title={isEN ? "สลับเป็นภาษาไทย" : "Switch to English"}
+          >
+            {isEN ? "🇹🇭 ไทย" : "🇬🇧 EN"}
+          </Link>
+
+          {/* Loading Auth Skeleton */}
+          <div className="flex items-center gap-2 px-3 py-2 border-2 border-black rounded-lg bg-gradient-to-br from-gray-50 to-gray-100">
+            <div className="w-7 h-7 rounded-full bg-gray-300 animate-pulse"></div>
+            <div className="w-20 h-4 bg-gray-300 rounded animate-pulse hidden sm:block"></div>
+            <div className="w-4 h-4 bg-gray-300 rounded animate-pulse"></div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       {/* Auth + Lang */}
