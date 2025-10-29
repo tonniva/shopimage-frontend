@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useAuth } from '@/components/AuthProvider';
 import { 
   CheckCircle, 
@@ -170,12 +171,12 @@ export default function PropertySnapSuccessPage() {
           </div>
           <h2 className="text-2xl font-semibold text-gray-800 mb-2">กรุณาเข้าสู่ระบบ</h2>
           <p className="text-gray-600 mb-6">หน้านี้สำหรับผู้ที่สร้างรายงานเท่านั้น</p>
-          <a
+          <Link
             href="/property-snap"
             className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
           >
             ไปที่หน้าหลัก
-          </a>
+          </Link>
         </div>
       </div>
     );

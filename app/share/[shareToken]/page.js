@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
+import Link from 'next/link';
 import {
   MapPin,
   Star,
@@ -784,12 +785,12 @@ export default function SharedPropertyReportPage() {
                     <p className="text-gray-700 font-semibold mb-2">
                       สร้าง Link แบบนี้ด้วย  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 font-bold">Property Snap</span>
                     </p>
-                    <a 
+                    <Link 
                       href="/property-snap" 
                       className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl font-semibold hover:shadow-lg hover:scale-105 transition-all duration-200 shadow-lg shadow-emerald-500/30"
                     >
                       <span>ลง ขาย ฟรี</span>
-                    </a>
+                    </Link>
                   </div>
                 </div>
               </div>

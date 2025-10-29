@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 
@@ -42,7 +43,7 @@ export default function ForgotPage() {
           {sending ? "กำลังส่งลิงก์..." : "ส่งลิงก์รีเซ็ต"}
         </button>
         <p className="text-xs text-gray-500">
-          กลับไป <a href="/login" className="underline">เข้าสู่ระบบ</a>
+          กลับไป <Link href="/login" className="underline">เข้าสู่ระบบ</Link>
         </p>
       </form>
     </main>

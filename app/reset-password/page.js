@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -75,7 +76,7 @@ export default function ResetPasswordPage() {
           {working ? "กำลังบันทึก..." : "บันทึกรหัสผ่านใหม่"}
         </button>
         <p className="text-xs text-gray-500">
-          กลับไป <a href="/login" className="underline">เข้าสู่ระบบ</a>
+          กลับไป <Link href="/login" className="underline">เข้าสู่ระบบ</Link>
         </p>
       </form>
     </main>
