@@ -207,7 +207,9 @@ export default function EditPropertySnapPage() {
           buildingAge: report.buildingAge?.toString() || '',
           contactPhone: report.contactPhone || '',
           contactEmail: report.contactEmail || '',
-          contactLine: report.contactLine || ''
+          contactLine: report.contactLine || '',
+          province: report.province || '',
+          region: report.region || ''
         });
         
         // Set images

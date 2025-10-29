@@ -34,11 +34,12 @@ import {
   ArrowUp,
   ArrowDown
 } from 'lucide-react';
-import { trackPropertySnap, trackEvent, EVENTS, CATEGORIES } from '@/lib/analytics';
+import { trackPropertySnap, trackEvent, EVENTS, CATEGORIES as ANALYTICS_CATEGORIES } from '@/lib/analytics';
 import { useImageProcessing } from '@/hooks/useImageProcessing';
 import { validateImageFile, compressImages, formatFileSize } from '@/utils/image-utils';
 import ImageProcessingProgress from '@/components/ImageProcessingProgress';
 import { ALL_PROVINCES, getAllRegions, getRegionByProvince } from '@/lib/thailand-data';
+import { CATEGORIES, getCategorySlug, getProvinceSlug } from '@/lib/property-mappings';
 
 // Helper function to get place icon
 const getPlaceIcon = (type) => {
@@ -170,6 +171,7 @@ export default function CreatePropertySnapPage() {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
+    category: '', // Category (e.g., 'ขายบ้าน', 'ให้เช่าคอนโด')
     propertyType: 'house',
     listingType: 'sale',
     price: '',
@@ -497,6 +499,8 @@ export default function CreatePropertySnapPage() {
       formDataToSend.append('nearbyPlaces', JSON.stringify(nearbyPlaces));
       
       // Add new property fields
+      formDataToSend.append('category', formData.category); // Category for SEO
+      formDataToSend.append('categorySlug', getCategorySlug(formData.category)); // Category slug
       formDataToSend.append('propertyType', formData.propertyType);
       formDataToSend.append('listingType', formData.listingType);
       formDataToSend.append('price', formData.price);
@@ -512,6 +516,7 @@ export default function CreatePropertySnapPage() {
       formDataToSend.append('contactEmail', formData.contactEmail);
       formDataToSend.append('contactLine', formData.contactLine);
       formDataToSend.append('province', formData.province);
+      formDataToSend.append('provinceSlug', getProvinceSlug(formData.province)); // Province slug
       formDataToSend.append('region', formData.region);
       
       images.forEach(image => {
@@ -1003,6 +1008,46 @@ export default function CreatePropertySnapPage() {
                   />
                 </div>
 
+                {/* Category - New field for SEO */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    หมวดหมู่ *
+                  </label>
+                  <select
+                    value={formData.category}
+                    onChange={(e) => {
+                      const category = e.target.value;
+                      const categoryInfo = CATEGORIES[category];
+                      setFormData({
+                        ...formData,
+                        category: category,
+                        propertyType: categoryInfo?.propertyType || formData.propertyType,
+                        listingType: categoryInfo?.listingType || formData.listingType
+                      });
+                    }}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  >
+                    <option value="">เลือกหมวดหมู่</option>
+                    <optgroup label="ขาย">
+                      <option value="ขายบ้าน">🏠 ขายบ้าน</option>
+                      <option value="ขายคอนโด">🏢 ขายคอนโด</option>
+                      <option value="ขายทาวน์เฮาส์">🏡 ขายทาวน์เฮาส์</option>
+                      <option value="ขายที่ดิน">🏞️ ขายที่ดิน</option>
+                      <option value="ขายอาคารพาณิชย์">🏪 ขายอาคารพาณิชย์</option>
+                      <option value="ขายโรงงาน">🏭 ขายโรงงาน</option>
+                    </optgroup>
+                    <optgroup label="ให้เช่า">
+                      <option value="ให้เช่าบ้าน">🏠 ให้เช่าบ้าน</option>
+                      <option value="ให้เช่าคอนโด">🏢 ให้เช่าคอนโด</option>
+                      <option value="ให้เช่าทาวน์เฮาส์">🏡 ให้เช่าทาวน์เฮาส์</option>
+                      <option value="ให้เช่าที่ดิน">🏞️ ให้เช่าที่ดิน</option>
+                      <option value="ให้เช่าอาคารพาณิชย์">🏪 ให้เช่าอาคารพาณิชย์</option>
+                      <option value="ให้เช่าห้องพัก">🛏️ ให้เช่าห้องพัก</option>
+                    </optgroup>
+                  </select>
+                </div>
+
                 {/* Property Type */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1015,9 +1060,12 @@ export default function CreatePropertySnapPage() {
                   >
                     <option value="house">บ้าน</option>
                     <option value="condo">คอนโด</option>
+                    <option value="townhouse">ทาวน์เฮาส์</option>
                     <option value="land">ที่ดิน</option>
                     <option value="commercial">เชิงพาณิชย์</option>
                     <option value="office">ออฟฟิศ</option>
+                    <option value="factory">โรงงาน</option>
+                    <option value="room">ห้องพัก</option>
                   </select>
                 </div>
 

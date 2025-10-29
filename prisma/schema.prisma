@@ -594,12 +594,19 @@ model PropertyReport {
   contactLine      String?
   contactPhone     String?
   province         String?
+  provinceSlug     String?
   region           String?
+  category         String?
+  categorySlug     String?
   user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([shareToken])
   @@index([locationLat, locationLng])
+  @@index([province])
+  @@index([provinceSlug])
+  @@index([category])
+  @@index([categorySlug])
   @@schema("public")
 }
 

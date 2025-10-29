@@ -184,7 +184,12 @@ export async function POST(request) {
           
           // Location fields
           province: province,
-          region: region
+          provinceSlug: formData.get('provinceSlug') || null,
+          region: region,
+          
+          // SEO fields
+          category: formData.get('category') || null,
+          categorySlug: formData.get('categorySlug') || null
         }
       });
 
