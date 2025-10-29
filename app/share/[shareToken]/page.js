@@ -287,7 +287,7 @@ export default function SharedPropertyReportPage() {
           <div className="flex items-center justify-between py-4">
             <div className="flex items-center gap-4">
               <div className="relative">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
                   <Home className="w-6 h-6 text-white" />
                 </div>
                 <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
@@ -325,7 +325,7 @@ export default function SharedPropertyReportPage() {
             {/* Dynamic Header Slideshow */}
             {report.headerImages && report.headerImages.length > 0 && (
               <div className="mb-6">
-                <div className="relative rounded-2xl overflow-hidden shadow-2xl h-64 sm:h-80 md:h-96">
+                <div className="relative rounded-xl overflow-hidden shadow-2xl h-64 sm:h-80 md:h-96">
                   {report.headerImages.map((img, index) => (
                     <div 
                       key={index} 
@@ -401,7 +401,7 @@ export default function SharedPropertyReportPage() {
         )}
 
         {/* Property Overview */}
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-4 mb-6 backdrop-blur-sm">
+        <div className="bg-white rounded-xl shadow-xl border border-gray-100 p-4 mb-6 backdrop-blur-sm">
           <div className="mb-8">
             <div className="flex items-start justify-between gap-4 mb-4">
               <h1 className="text-2xl sm:text-4xl font-bold text-gray-900 leading-tight tracking-tight">
@@ -422,11 +422,11 @@ export default function SharedPropertyReportPage() {
           </div>
 
           {/* Price and Key Info */}
-          <div className="bg-gradient-to-br from-emerald-50 via-teal-50 to-blue-50 rounded-2xl p-4 mb-4 border border-emerald-100 shadow-sm">
+          <div className="bg-gradient-to-br from-emerald-50 via-teal-50 to-blue-50 rounded-xl p-4 mb-4 border border-emerald-100 shadow-sm">
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
               <div className="flex-1">
                 <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                  <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
                     <span className="text-2xl font-bold text-white">฿</span>
                   </div>
                   <div>
@@ -457,9 +457,9 @@ export default function SharedPropertyReportPage() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
             {/* Area */}
             {report.area && (
-              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-5 text-center hover:shadow-lg transition-all duration-300 border border-blue-100 hover:scale-105 group">
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-5 text-center hover:shadow-lg transition-all duration-300 border border-blue-100 hover:scale-105 group">
                 <div className="flex items-center justify-center mb-3">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                     <Square className="w-6 h-6 text-white" />
                   </div>
                 </div>
@@ -472,9 +472,9 @@ export default function SharedPropertyReportPage() {
 
             {/* Land Area */}
             {report.landArea && (
-              <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-5 text-center hover:shadow-lg transition-all duration-300 border border-emerald-100 hover:scale-105 group">
+              <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-5 text-center hover:shadow-lg transition-all duration-300 border border-emerald-100 hover:scale-105 group">
                 <div className="flex items-center justify-center mb-3">
-                  <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                  <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                     <TreePine className="w-6 h-6 text-white" />
                   </div>
                 </div>
@@ -487,9 +487,9 @@ export default function SharedPropertyReportPage() {
 
             {/* Bedrooms */}
             {report.bedrooms && (
-              <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-5 text-center hover:shadow-lg transition-all duration-300 border border-purple-100 hover:scale-105 group">
+              <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-5 text-center hover:shadow-lg transition-all duration-300 border border-purple-100 hover:scale-105 group">
                 <div className="flex items-center justify-center mb-3">
-                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                  <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                     <Bed className="w-6 h-6 text-white" />
                   </div>
                 </div>
@@ -502,9 +502,9 @@ export default function SharedPropertyReportPage() {
 
             {/* Bathrooms */}
             {report.bathrooms && (
-              <div className="bg-gradient-to-br from-cyan-50 to-blue-50 rounded-2xl p-5 text-center hover:shadow-lg transition-all duration-300 border border-cyan-100 hover:scale-105 group">
+              <div className="bg-gradient-to-br from-cyan-50 to-blue-50 rounded-xl p-5 text-center hover:shadow-lg transition-all duration-300 border border-cyan-100 hover:scale-105 group">
                 <div className="flex items-center justify-center mb-3">
-                  <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                  <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
                     <Bath className="w-6 h-6 text-white" />
                   </div>
                 </div>
@@ -520,8 +520,8 @@ export default function SharedPropertyReportPage() {
           {(report.floors || report.buildingAge) && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
               {report.floors && (
-                <div className="flex items-center gap-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-4 hover:shadow-md transition-all duration-300 border border-blue-100">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
+                <div className="flex items-center gap-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 hover:shadow-md transition-all duration-300 border border-blue-100">
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
                     <Layers className="w-6 h-6 text-white" />
                   </div>
                   <div className="min-w-0">
@@ -536,8 +536,8 @@ export default function SharedPropertyReportPage() {
               )}
 
               {report.buildingAge && (
-                <div className="flex items-center gap-4 bg-gradient-to-br from-orange-50 to-amber-50 rounded-2xl p-4 hover:shadow-md transition-all duration-300 border border-orange-100">
-                  <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
+                <div className="flex items-center gap-4 bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl p-4 hover:shadow-md transition-all duration-300 border border-orange-100">
+                  <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-md">
                     <CalendarIcon className="w-6 h-6 text-white" />
                   </div>
                   <div className="min-w-0">
@@ -553,7 +553,7 @@ export default function SharedPropertyReportPage() {
             </div>
           )}
 
-          <div className="bg-gradient-to-r from-slate-50 to-gray-50 rounded-2xl p-6 border border-gray-100">
+          <div className="bg-gradient-to-r from-slate-50 to-gray-50 rounded-xl p-6 border border-gray-100">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
               <div className="flex flex-col items-center sm:items-start gap-2">
                 <div className="flex items-center gap-2 text-gray-500">
@@ -589,9 +589,9 @@ export default function SharedPropertyReportPage() {
 
         {/* Contact Information */}
         {(report.contactPhone || report.contactEmail || report.contactLine) && (
-          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-4 mb-4">
+          <div className="bg-white rounded-xl shadow-xl border border-gray-100 p-4 mb-4">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
+              <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
                 <Phone className="w-6 h-6 text-white" />
               </div>
               <div>
@@ -601,7 +601,7 @@ export default function SharedPropertyReportPage() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {report.contactPhone && (
-                <div className="flex items-center gap-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-4 border border-green-100 hover:shadow-md transition-all">
+                <div className="flex items-center gap-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border border-green-100 hover:shadow-md transition-all">
                   <div className="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center">
                     <Phone className="w-5 h-5 text-white" />
                   </div>
@@ -617,7 +617,7 @@ export default function SharedPropertyReportPage() {
                 </div>
               )}
               {report.contactEmail && (
-                <div className="flex items-center gap-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-4 border border-blue-100 hover:shadow-md transition-all">
+                <div className="flex items-center gap-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-100 hover:shadow-md transition-all">
                   <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center">
                     <Mail className="w-5 h-5 text-white" />
                   </div>
@@ -633,7 +633,7 @@ export default function SharedPropertyReportPage() {
                 </div>
               )}
               {report.contactLine && (
-                <div className="flex items-center gap-4 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-4 border border-emerald-100 hover:shadow-md transition-all">
+                <div className="flex items-center gap-4 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-4 border border-emerald-100 hover:shadow-md transition-all">
                   <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center">
                     <MessageCircle className="w-5 h-5 text-white" />
                   </div>
@@ -648,10 +648,10 @@ export default function SharedPropertyReportPage() {
         )}
 
         {/* Location */}
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-4 mb-4">
+        <div className="bg-white rounded-xl shadow-xl border border-gray-100 p-4 mb-4">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
             <div className="flex items-start gap-4 flex-1">
-              <div className="w-12 h-12 bg-gradient-to-br from-red-500 to-pink-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
+              <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-pink-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
                 <MapPin className="w-6 h-6 text-white" />
               </div>
               <div className="min-w-0 flex-1">
@@ -686,9 +686,9 @@ export default function SharedPropertyReportPage() {
         </div>
 
         {/* Nearby Places */}
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-4">
+        <div className="bg-white rounded-xl shadow-xl border border-gray-100 p-4">
           <div className="flex items-center gap-4 mb-8">
-            <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
               <MapPin className="w-7 h-7 text-white" />
             </div>
             <div>
@@ -707,7 +707,7 @@ export default function SharedPropertyReportPage() {
                       <div className="grid grid-cols-2 grid-rows-2 gap-4 w-[calc(100vw-4rem)] max-w-[800px]">
                         {report.nearbyPlaces.slice(pageIndex * 4, pageIndex * 4 + 4).map((place, idx) => (
                           <div key={idx} className="w-full">
-                            <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl p-4 hover:shadow-xl transition-all duration-300 border border-gray-100 group h-full flex flex-col">
+                            <div className="bg-gradient-to-br from-white to-gray-50 rounded-xl p-4 hover:shadow-xl transition-all duration-300 border border-gray-100 group h-full flex flex-col">
                               {/* Place Image */}
                               <div className="mb-3">
                                 {(place.primary_photo?.url || place.photos?.[0]?.url || place.photoUrl || place.photo) ? (
@@ -767,7 +767,7 @@ export default function SharedPropertyReportPage() {
             </div>
           ) : (
             <div className="text-center py-8 text-gray-500">
-              <MapPin className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+              <MapPin className="w-10 h-10 mx-auto mb-3 text-gray-300" />
               <p>ไม่มีข้อมูลสถานที่ใกล้เคียง</p>
             </div>
           )}
@@ -775,9 +775,9 @@ export default function SharedPropertyReportPage() {
 
             {/* Footer */}
             <div className="text-center mt-12 mb-8">
-              <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-4">
+              <div className="bg-white rounded-xl shadow-xl border border-gray-100 p-4">
                 <div className="flex flex-col items-center gap-4">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
                     <Home className="w-8 h-8 text-white" />
                   </div>
                   <div>

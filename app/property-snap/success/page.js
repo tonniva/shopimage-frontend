@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/components/AuthProvider';
 import { useRouter } from 'next/navigation';
+import Swal from 'sweetalert2';
 import { 
   Plus, 
   Eye, 
@@ -67,7 +68,23 @@ export default function PropertySnapSuccessPage() {
   };
 
   const handleDeleteReport = async (reportId) => {
-    if (!confirm('คุณแน่ใจหรือไม่ที่จะลบรายงานนี้?')) return;
+    const report = reports.find(r => r.id === reportId);
+    
+    const result = await Swal.fire({
+      icon: 'warning',
+      title: 'ยืนยันการลบ',
+      text: report
+        ? `คุณแน่ใจหรือไม่ที่จะลบรายงาน "${report.title}"?`
+        : 'คุณแน่ใจหรือไม่ที่จะลบรายงานนี้?',
+      showCancelButton: true,
+      confirmButtonColor: '#EF4444',
+      cancelButtonColor: '#6B7280',
+      confirmButtonText: 'ลบ',
+      cancelButtonText: 'ยกเลิก',
+      reverseButtons: true
+    });
+
+    if (!result.isConfirmed) return;
     
     try {
       const response = await fetch(`/api/property-snap/delete/${reportId}`, {
@@ -76,13 +93,29 @@ export default function PropertySnapSuccessPage() {
       
       if (response.ok) {
         setReports(reports.filter(report => report.id !== reportId));
-        alert('ลบรายงานสำเร็จ!');
+        
+        await Swal.fire({
+          icon: 'success',
+          title: 'ลบสำเร็จ',
+          text: 'รายงานถูกลบเรียบร้อยแล้ว',
+          timer: 2000,
+          showConfirmButton: false
+        });
       } else {
-        alert('เกิดข้อผิดพลาดในการลบรายงาน');
+        const data = await response.json();
+        await Swal.fire({
+          icon: 'error',
+          title: 'ลบไม่สำเร็จ',
+          text: data.error || 'เกิดข้อผิดพลาดในการลบรายงาน'
+        });
       }
     } catch (error) {
       console.error('Error deleting report:', error);
-      alert('เกิดข้อผิดพลาดในการลบรายงาน');
+      await Swal.fire({
+        icon: 'error',
+        title: 'เกิดข้อผิดพลาด',
+        text: 'ไม่สามารถลบรายงานได้ กรุณาลองอีกครั้ง'
+      });
     }
   };
 

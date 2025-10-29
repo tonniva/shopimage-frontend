@@ -69,7 +69,7 @@ export const metadata = {
   icons: {
     icon: "/favicon.ico"
   },
-  metadataBase: new URL("https://ย่อรูป.com"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "https://www.xn--s3cnd3b9cte.com"),
 };
 
 export default function RootLayout({ children }) {

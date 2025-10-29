@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createServerSupabase } from '@/utils/supabase/server';
 import { prisma } from '@/lib/prisma';
+import { deletePropertyReportImagesServer } from '@/lib/storage-server';
 
 /**
  * GET /api/property-snap/[id]
@@ -385,6 +386,113 @@ export async function PUT(request, { params }) {
     return NextResponse.json(
       { 
         error: 'Failed to update report',
+        details: error.message || 'Unknown error occurred'
+      },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * DELETE /api/property-snap/[id]
+ * Delete a property report
+ */
+export async function DELETE(request, { params }) {
+  try {
+    const { id } = await params;
+    
+    console.log('🗑️ DELETE /api/property-snap/' + id, 'starting...');
+    
+    // Get authenticated user
+    const supabase = await createServerSupabase();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      console.log('❌ Auth failed:', authError || 'No user');
+      return NextResponse.json(
+        { error: 'Unauthorized', details: 'Please login to delete reports', type: 'AuthError' },
+        { status: 401 }
+      );
+    }
+    
+    console.log('✅ Auth success:', user.email);
+
+    // Get user from User table
+    const dbUser = await prisma.user.findUnique({
+      where: { email: user.email },
+      select: { id: true, email: true }
+    });
+
+    if (!dbUser) {
+      console.log('❌ User not found in database:', user.email);
+      return NextResponse.json(
+        { error: 'User not found', details: 'Your account is not in the database', type: 'UserNotFound' },
+        { status: 403 }
+      );
+    }
+
+    console.log('✅ DB User found:', dbUser.id);
+
+    // Get the report to check ownership
+    const report = await prisma.propertyReport.findUnique({
+      where: { id },
+      select: { 
+        id: true,
+        userId: true,
+        userImages: true
+      }
+    });
+
+    if (!report) {
+      console.log('❌ Report not found:', id);
+      return NextResponse.json(
+        { error: 'Report not found', details: `No report found with id: ${id}`, type: 'NotFound' },
+        { status: 404 }
+      );
+    }
+    
+    console.log('✅ Report found, owner userId:', report.userId);
+
+    // Check ownership - compare userId (cuid) with dbUser.id
+    if (report.userId !== dbUser.id) {
+      console.log('❌ Ownership check failed:', report.userId, 'vs', dbUser.id);
+      return NextResponse.json(
+        { error: 'Forbidden', details: 'You can only delete your own reports', type: 'Forbidden' },
+        { status: 403 }
+      );
+    }
+    
+    console.log('✅ Ownership verified');
+
+    // Delete images from Supabase Storage if they exist
+    try {
+      await deletePropertyReportImagesServer(dbUser.id, id);
+      console.log('✅ Images deleted from storage');
+    } catch (storageError) {
+      console.error('⚠️ Warning: Failed to delete images from storage:', storageError);
+      // Continue with database deletion even if storage deletion fails
+    }
+
+    // Delete the report from database
+    await prisma.propertyReport.delete({
+      where: {
+        id,
+        userId: dbUser.id
+      }
+    });
+
+    console.log('✅ Report deleted successfully:', id);
+
+    return NextResponse.json({
+      success: true,
+      message: 'Report deleted successfully'
+    });
+
+  } catch (error) {
+    console.error('❌ Error deleting report:', error);
+    return NextResponse.json(
+      { 
+        error: 'Failed to delete report',
         details: error.message || 'Unknown error occurred'
       },
       { status: 500 }

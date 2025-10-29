@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/components/AuthProvider';
+import Swal from 'sweetalert2';
 import { 
   MapPin, 
   Camera, 
@@ -96,7 +97,23 @@ export default function PropertySnapMainPage() {
 
   // Handle delete
   const handleDelete = async (propertyId) => {
-    if (!confirm('คุณแน่ใจหรือไม่ที่จะลบรายงานนี้?')) return;
+    const property = properties.find(p => p.id === propertyId);
+    
+    const result = await Swal.fire({
+      icon: 'warning',
+      title: 'ยืนยันการลบ',
+      text: property 
+        ? `คุณแน่ใจหรือไม่ที่จะลบรายงาน "${property.title}"?`
+        : 'คุณแน่ใจหรือไม่ที่จะลบรายงานนี้?',
+      showCancelButton: true,
+      confirmButtonColor: '#EF4444',
+      cancelButtonColor: '#6B7280',
+      confirmButtonText: 'ลบ',
+      cancelButtonText: 'ยกเลิก',
+      reverseButtons: true
+    });
+
+    if (!result.isConfirmed) return;
 
     try {
       const response = await fetch(`/api/property-snap/${propertyId}`, {
@@ -106,9 +123,29 @@ export default function PropertySnapMainPage() {
       if (response.ok) {
         // Remove from local state
         setProperties(prev => prev.filter(prop => prop.id !== propertyId));
+        
+        await Swal.fire({
+          icon: 'success',
+          title: 'ลบสำเร็จ',
+          text: 'รายงานถูกลบเรียบร้อยแล้ว',
+          timer: 2000,
+          showConfirmButton: false
+        });
+      } else {
+        const data = await response.json();
+        await Swal.fire({
+          icon: 'error',
+          title: 'ลบไม่สำเร็จ',
+          text: data.error || 'เกิดข้อผิดพลาดในการลบรายงาน'
+        });
       }
     } catch (error) {
       console.error('Error deleting property:', error);
+      await Swal.fire({
+        icon: 'error',
+        title: 'เกิดข้อผิดพลาด',
+        text: 'ไม่สามารถลบรายงานได้ กรุณาลองอีกครั้ง'
+      });
     }
   };
 

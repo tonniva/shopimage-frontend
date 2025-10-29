@@ -908,34 +908,7 @@ export default function CreatePropertySnapPage() {
                   )}
                   
                   {/* Sample Locations */}
-                  <div className="mt-6 pt-6 border-t border-gray-200">
-                    <div className="text-center text-sm text-gray-500 mb-4">
-                      หรือเลือกตำแหน่งตัวอย่าง:
-                    </div>
-                    
-                    <div className="grid grid-cols-1 gap-2">
-                      <button
-                        onClick={() => handleLocationSelect(13.7563, 100.5018, 'กรุงเทพมหานคร')}
-                        className="bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 transition-colors text-sm"
-                      >
-                        📍 กรุงเทพมหานคร
-                      </button>
-                      
-                      <button
-                        onClick={() => handleLocationSelect(18.7883, 98.9853, 'เชียงใหม่')}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors text-sm"
-                      >
-                        🏔️ เชียงใหม่
-                      </button>
-                      
-                      <button
-                        onClick={() => handleLocationSelect(12.9236, 100.8825, 'พัทยา')}
-                        className="bg-purple-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-purple-700 transition-colors text-sm"
-                      >
-                        🏖️ พัทยา
-                      </button>
-                    </div>
-                  </div>
+                  
                 </div>
               </div>
 

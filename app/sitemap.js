@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { CATEGORIES } from '@/lib/property-mappings';
 
 export default async function sitemap() {
   try {
@@ -10,11 +11,13 @@ export default async function sitemap() {
       },
       select: {
         shareToken: true,
-        updatedAt: true
+        updatedAt: true,
+        category: true,
+        province: true
       }
     });
 
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://property-snap.com';
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.xn--s3cnd3b9cte.com';
 
     // Generate sitemap entries for each property
     const propertyEntries = properties.map((property) => ({
@@ -23,6 +26,21 @@ export default async function sitemap() {
       changeFrequency: 'weekly',
       priority: 0.8,
     }));
+
+    // Generate search pages for each category + popular provinces
+    const popularProvinces = ['กรุงเทพ', 'เชียงใหม่', 'ภูเก็ต', 'ชลบุรี', 'ระยอง', 'นครราชสีมา'];
+    const searchEntries = [];
+    
+    for (const categoryThai of Object.keys(CATEGORIES)) {
+      for (const provinceThai of popularProvinces) {
+        searchEntries.push({
+          url: `${baseUrl}/${encodeURIComponent(categoryThai)}/${CATEGORIES[categoryThai].slug || 'search'}`,
+          lastModified: new Date(),
+          changeFrequency: 'daily',
+          priority: 0.9,
+        });
+      }
+    }
 
     // Add main pages
     const routes = [
@@ -46,7 +64,7 @@ export default async function sitemap() {
       },
     ];
 
-    return [...routes, ...propertyEntries];
+    return [...routes, ...searchEntries, ...propertyEntries];
   } catch (error) {
     console.error('Error generating sitemap:', error);
     return [
