@@ -55,21 +55,22 @@ export async function GET(request) {
     const searchConditions = [];
     
     if (category) {
-      // Try to match by category first, then fallback to propertyType + listingType
+      // Try to match by category - use propertyType + listingType fallback
+      // Note: category field may not exist in database yet, so we use fallback approach
       const categoryInfo = getCategoryInfo(category);
       if (categoryInfo) {
-        categoryConditions.push(
-          { category: category },
-          { 
-            AND: [
-              { propertyType: categoryInfo.propertyType },
-              { listingType: categoryInfo.listingType }
-            ]
-          }
-        );
-      } else {
-        categoryConditions.push({ category: category });
+        // Use propertyType + listingType as primary matching (works with existing data)
+        categoryConditions.push({ 
+          AND: [
+            { propertyType: categoryInfo.propertyType },
+            { listingType: categoryInfo.listingType }
+          ]
+        });
+        // TODO: Add category field matching once database migration is complete
+        // categoryConditions.push({ category: category });
       }
+      // If categoryInfo is null, category string doesn't match known categories
+      // In this case, we could try direct category field match, but it's likely invalid
     }
     
     if (province) {
@@ -117,7 +118,7 @@ export async function GET(request) {
           description: true,
           propertyType: true,
           listingType: true,
-          category: true,
+          // category: true, // TODO: Uncomment when category field is available in database
           price: true,
           area: true,
           landArea: true,
@@ -152,7 +153,7 @@ export async function GET(request) {
       description: property.description,
       propertyType: property.propertyType,
       listingType: property.listingType,
-      category: property.category,
+      category: property.category || null, // Will be null until category field is available
       price: property.price,
       area: property.area,
       landArea: property.landArea,
