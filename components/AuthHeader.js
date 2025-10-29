@@ -134,7 +134,25 @@ export function AuthHeader() {
                       </div>
                     </div>
                   </div>
-
+                  {user.email?.toLowerCase() == 'tongiggabite@gmail.com' && (
+                    <Link
+                    href={"/admin/property-snap"} 
+                    onClick={() => setUserMenuOpen(false)}
+                  >
+                    <div className="px-4 py-3 bg-gradient-to-br from-blue-50 to-purple-50 border-b border-gray-200">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-500 to-blue-600 text-white flex items-center justify-center text-base font-bold uppercase shadow-sm">
+                        A
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-bold text-gray-900 truncate">
+                          { user.email?.toLowerCase()=='tongiggabite@gmail.com'?'Admin':'User' }
+                        </div> 
+                      </div>
+                    </div>
+                      </div>
+                      </Link>)  }
+                
                   {/* Menu Items */}
                   <div className="py-1">
                     <Link
@@ -151,7 +169,8 @@ export function AuthHeader() {
                       </div>
                     </Link>
 
-                    <div className="h-px bg-gray-200 mx-3"></div>
+                    <div className="h-px bg-gray-200 mx-3"> 
+                    </div>
 
                     <button
                       onClick={() => {

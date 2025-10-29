@@ -15,7 +15,7 @@ export function LoginModal({ isOpen, onClose }) {
   const handleGoogleLogin = async () => {
     setLoading(true);
     try {
-      const currentPath = window.location.pathname;
+      const currentPath = window.location.pathname; 
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
