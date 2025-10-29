@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { prisma, withRetry } from '@/lib/prisma';
 import { memoryCache } from '@/lib/cache';
 
 export async function GET(request, { params }) {
@@ -10,20 +10,24 @@ export async function GET(request, { params }) {
     let cacheConfig = memoryCache.config.get('share_page');
     
     if (!cacheConfig) {
-      // Get cache config from database
-      cacheConfig = await prisma.cacheConfig.findUnique({
-        where: { type: 'share_page' }
+      // Get cache config from database (with retry)
+      cacheConfig = await withRetry(async () => {
+        return await prisma.cacheConfig.findUnique({
+          where: { type: 'share_page' }
+        });
       });
 
-      // If not found, create default
+      // If not found, create default (with retry)
       if (!cacheConfig) {
-        cacheConfig = await prisma.cacheConfig.create({
-          data: {
-            type: 'share_page',
-            enabled: true,
-            maxAge: 300,
-            staleWhileRevalidate: true
-          }
+        cacheConfig = await withRetry(async () => {
+          return await prisma.cacheConfig.create({
+            data: {
+              type: 'share_page',
+              enabled: true,
+              maxAge: 300,
+              staleWhileRevalidate: true
+            }
+          });
         });
       }
       
@@ -63,20 +67,22 @@ export async function GET(request, { params }) {
     
     console.log('❌ Cache MISS - Fetching from database');
     
-    // Fetch report from database
-    const report = await prisma.propertyReport.findUnique({
-      where: {
-        shareToken: shareToken,
-        isPublic: true
-      },
-      include: {
-        user: {
-          select: {
-            name: true,
-            email: true
+    // Fetch report from database (with retry)
+    const report = await withRetry(async () => {
+      return await prisma.propertyReport.findUnique({
+        where: {
+          shareToken: shareToken,
+          isPublic: true
+        },
+        include: {
+          user: {
+            select: {
+              name: true,
+              email: true
+            }
           }
         }
-      }
+      });
     });
 
     if (!report) {
@@ -96,9 +102,9 @@ export async function GET(request, { params }) {
       }, { status: 403 });
     }
 
-    // Fetch header images in parallel with view count update (fire-and-forget)
-    const [headerRecords] = await Promise.all([
-      prisma.propertySnapHeader.findMany({
+    // Fetch header images (with retry)
+    const headerRecords = await withRetry(async () => {
+      return await prisma.propertySnapHeader.findMany({
         where: {
           userId: report.userId,
           isActive: true
@@ -106,8 +112,8 @@ export async function GET(request, { params }) {
         orderBy: {
           order: 'asc'
         }
-      })
-    ]);
+      });
+    });
 
     // Update view count asynchronously (fire-and-forget)
     prisma.propertyReport.update({
@@ -208,6 +214,21 @@ export async function GET(request, { params }) {
 
   } catch (error) {
     console.error('Error fetching shared report:', error);
-    return NextResponse.json({ error: 'Failed to fetch report' }, { status: 500 });
+    
+    // Handle connection errors specifically
+    if (error.code === 'P1001') {
+      return NextResponse.json({ 
+        error: 'Database connection failed',
+        message: 'Please try again in a moment',
+        code: 'P1001',
+        details: 'The database connection pool is temporarily full. Please retry.'
+      }, { status: 503 }); // Service Unavailable
+    }
+    
+    return NextResponse.json({ 
+      error: 'Failed to fetch report',
+      details: error.message || 'Unknown error',
+      code: error.code || null
+    }, { status: 500 });
   }
 }

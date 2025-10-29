@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { prisma, withRetry } from '@/lib/prisma';
 import { getCategoryThai, getProvinceThai, getCategoryInfo } from '@/lib/property-mappings';
 
 // Public search API - no auth required
@@ -104,9 +104,9 @@ export async function GET(request) {
       }
     }
     
-    // Get properties with pagination
+    // Get properties with pagination (with retry)
     const [properties, total] = await Promise.all([
-      prisma.propertyReport.findMany({
+      withRetry(() => prisma.propertyReport.findMany({
         where,
         orderBy: { createdAt: 'desc' },
         skip,
@@ -141,8 +141,8 @@ export async function GET(request) {
           createdAt: true,
           updatedAt: true
         }
-      }),
-      prisma.propertyReport.count({ where })
+      })),
+      withRetry(() => prisma.propertyReport.count({ where }))
     ]);
     
     // Transform data for frontend
@@ -200,10 +200,22 @@ export async function GET(request) {
     
   } catch (error) {
     console.error('❌ Search API error:', error);
+    
+    // Handle connection errors specifically
+    if (error.code === 'P1001') {
+      return NextResponse.json({ 
+        error: 'Database connection failed',
+        message: 'Please try again in a moment',
+        code: 'P1001',
+        details: 'The database connection pool is temporarily full. Please retry.'
+      }, { status: 503 }); // Service Unavailable
+    }
+    
     return NextResponse.json({ 
       error: 'Failed to search properties',
       details: error.message || 'Unknown error',
-      type: error.name || 'Error'
+      type: error.name || 'Error',
+      code: error.code || null
     }, { status: 500 });
   }
 }

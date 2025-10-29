@@ -703,16 +703,16 @@ export default function SharedPropertyReportPage() {
               {/* Horizontal Scroll Container */}
               <div className="overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                 <div className="flex gap-6" style={{ width: 'max-content' }}>
-                  {Array.from({ length: Math.ceil(report.nearbyPlaces.length / 4) }).map((_, pageIndex) => (
+                  {Array.from({ length: Math.ceil(report.nearbyPlaces.length / 6) }).map((_, pageIndex) => (
                     <div key={pageIndex} className="flex gap-6 flex-shrink-0">
-                      <div className="grid grid-cols-2 grid-rows-2 gap-4 w-[calc(100vw-4rem)] max-w-[800px]">
-                        {report.nearbyPlaces.slice(pageIndex * 4, pageIndex * 4 + 4).map((place, idx) => (
+                      <div className="grid grid-cols-3 gap-3 w-[calc(100vw-4rem)] max-w-[900px]">
+                        {report.nearbyPlaces.slice(pageIndex * 6, pageIndex * 6 + 6).map((place, idx) => (
                           <div key={idx} className="w-full">
-                            <div className="bg-gradient-to-br from-white to-gray-50 rounded-xl p-4 hover:shadow-xl transition-all duration-300 border border-gray-100 group h-full flex flex-col">
+                            <div className="bg-gradient-to-br from-white to-gray-50 rounded-lg p-3 hover:shadow-lg transition-all duration-300 border border-gray-100 group h-full flex flex-col">
                               {/* Place Image */}
-                              <div className="mb-3">
+                              <div className="mb-2">
                                 {(place.primary_photo?.url || place.photos?.[0]?.url || place.photoUrl || place.photo) ? (
-                                  <div className="aspect-[4/3] rounded-lg overflow-hidden bg-gray-200 shadow-sm">
+                                  <div className="aspect-[4/3] rounded-md overflow-hidden bg-gray-200 shadow-sm">
                                     <img
                                       src={place.primary_photo?.url || place.photos?.[0]?.url || place.photoUrl || place.photo}
                                       alt={place.name}
@@ -727,23 +727,23 @@ export default function SharedPropertyReportPage() {
                                         }
                                       }}
                                     />
-                                    <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center hidden">
-                                      <span className="text-2xl">{getPlaceIcon(place.type || place.primary_type)}</span>
+                                    <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 rounded-md flex items-center justify-center hidden">
+                                      <span className="text-xl">{getPlaceIcon(place.type || place.primary_type)}</span>
                                     </div>
                                   </div>
                                 ) : (
-                                  <div className="aspect-[4/3] bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center shadow-sm">
-                                    <span className="text-3xl">{getPlaceIcon(place.type || place.primary_type)}</span>
+                                  <div className="aspect-[4/3] bg-gradient-to-br from-gray-100 to-gray-200 rounded-md flex items-center justify-center shadow-sm">
+                                    <span className="text-xl">{getPlaceIcon(place.type || place.primary_type)}</span>
                                   </div>
                                 )}
                               </div>
 
                               <div className="flex flex-col flex-grow">
-                                <h4 className="font-bold text-gray-900 mb-2 line-clamp-2 text-xs leading-tight group-hover:text-blue-600 transition-colors flex-grow">{place.name}</h4>
+                                <h4 className="font-bold text-gray-900 mb-1.5 line-clamp-2 text-xs leading-tight group-hover:text-blue-600 transition-colors flex-grow">{place.name}</h4>
 
-                                <div className="flex flex-col gap-1.5 mt-auto">
-                                  <div className="flex items-center text-xs text-blue-600 font-semibold bg-blue-50 px-2 py-1 rounded-full w-fit">
-                                    <MapPin className="w-3 h-3 mr-1 flex-shrink-0" />
+                                <div className="flex flex-col gap-1 mt-auto">
+                                  <div className="flex items-center text-xs text-blue-600 font-semibold bg-blue-50 px-1.5 py-0.5 rounded-full w-fit">
+                                    <MapPin className="w-2.5 h-2.5 mr-1 flex-shrink-0" />
                                     <span className="truncate">
                                       {typeof place.distance === 'number'
                                         ? `${(place.distance / 1000).toFixed(1)} กม.`

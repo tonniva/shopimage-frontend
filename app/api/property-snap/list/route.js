@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createServerSupabase } from '@/utils/supabase/server';
-import { prisma } from '@/lib/prisma';
+import { prisma, withRetry } from '@/lib/prisma';
 
 export async function GET(request) {
   try {
@@ -12,9 +12,11 @@ export async function GET(request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Find user in Prisma database
-    const prismaUser = await prisma.user.findUnique({
-      where: { email: user.email }
+    // Find user in Prisma database with retry
+    const prismaUser = await withRetry(async () => {
+      return await prisma.user.findUnique({
+        where: { email: user.email }
+      });
     });
 
     if (!prismaUser) {
@@ -53,9 +55,9 @@ export async function GET(request) {
       where.status = status;
     }
 
-    // Get reports with pagination
+    // Get reports with pagination (with retry)
     const [reports, total] = await Promise.all([
-      prisma.propertyReport.findMany({
+      withRetry(() => prisma.propertyReport.findMany({
         where,
         orderBy: { createdAt: 'desc' },
         skip: (page - 1) * limit,
@@ -88,8 +90,8 @@ export async function GET(request) {
           createdAt: true,
           updatedAt: true
         }
-      }),
-      prisma.propertyReport.count({ where })
+      })),
+      withRetry(() => prisma.propertyReport.count({ where }))
     ]);
 
     // Transform data for frontend
@@ -138,10 +140,22 @@ export async function GET(request) {
 
   } catch (error) {
     console.error('Error fetching properties:', error);
+    
+    // Handle connection errors specifically
+    if (error.code === 'P1001') {
+      return NextResponse.json({ 
+        error: 'Database connection failed',
+        message: 'Please try again in a moment',
+        code: 'P1001',
+        details: 'The database connection pool is temporarily full. Please retry.'
+      }, { status: 503 }); // Service Unavailable
+    }
+    
     return NextResponse.json({ 
       error: 'Failed to fetch properties',
       details: error.message || 'Unknown error',
-      type: error.name || 'Error'
+      type: error.name || 'Error',
+      code: error.code || null
     }, { status: 500 });
   }
 }
