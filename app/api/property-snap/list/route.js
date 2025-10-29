@@ -151,6 +151,31 @@ export async function GET(request) {
       }, { status: 503 }); // Service Unavailable
     }
     
+    // Handle prepared statement errors (42P05, 26000) - Pooler incompatibility
+    if (error.code === '42P05' || 
+        error.code === '26000' ||
+        (error.message && error.message.includes('prepared statement'))) {
+      const errorCode = error.code || 'UNKNOWN';
+      const errorType = error.code === '42P05' 
+        ? 'prepared statement already exists (Transaction Mode)'
+        : error.code === '26000'
+        ? 'prepared statement does not exist (Pooler issue)'
+        : 'prepared statement error';
+      
+      console.error(`⚠️ Prepared statement error (${errorCode}) - ${errorType}`);
+      console.error('⚠️ SOLUTION: ใช้ DIRECT_URL แทน POOLER_URL ใน Vercel');
+      
+      return NextResponse.json({ 
+        error: 'Database connection error',
+        message: 'Prepared statement error detected',
+        code: errorCode,
+        errorType,
+        details: 'Prisma มีปัญหา prepared statements กับ Connection Pooler',
+        solution: 'แก้ไข: ใช้ DIRECT_URL แทน POOLER_URL ใน Vercel Environment Variables',
+        hint: 'DIRECT_URL ไม่มีปัญหา prepared statements และแนะนำให้ใช้เป็นหลัก'
+      }, { status: 503 }); // Service Unavailable
+    }
+    
     return NextResponse.json({ 
       error: 'Failed to fetch properties',
       details: error.message || 'Unknown error',
