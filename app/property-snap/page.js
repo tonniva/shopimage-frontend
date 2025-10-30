@@ -47,27 +47,40 @@ export default function PropertySnapMainPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState('all');
 
-  // Fetch properties from API
+  // Fetch properties from API (single source of truth)
   useEffect(() => {
-    const fetchProperties = async () => {
+    if (!user) return;
+    const ac = new AbortController();
+
+    (async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/property-snap/list');
+        const params = new URLSearchParams({
+          page: '1',
+          limit: '20',
+          search: searchTerm || '',
+          propertyType: selectedType || 'all',
+          status: 'all'
+        });
+        const response = await fetch(`/api/property-snap/list?${params}`, {
+          signal: ac.signal,
+          cache: 'no-store'
+        });
         if (response.ok) {
           const data = await response.json();
           setProperties(data.properties || []);
         }
       } catch (error) {
-        console.error('Error fetching properties:', error);
+        if (error.name !== 'AbortError') {
+          console.error('Error fetching properties:', error);
+        }
       } finally {
         setLoading(false);
       }
-    };
+    })();
 
-    if (user) {
-      fetchProperties();
-    }
-  }, [user]);
+    return () => ac.abort();
+  }, [user, searchTerm, selectedType]);
 
   // Handle status change
   const handleStatusChange = async (propertyId, newStatus) => {
@@ -183,23 +196,7 @@ export default function PropertySnapMainPage() {
     'default': MapPin
   };
 
-  useEffect(() => {
-    fetchProperties();
-  }, []);
-
-  const fetchProperties = async () => {
-    try {
-      const response = await fetch('/api/property-snap/list');
-      if (response.ok) {
-        const data = await response.json();
-        setProperties(data.properties || []);
-      }
-    } catch (error) {
-      console.error('Error fetching properties:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  
 
   const filteredProperties = properties.filter(property => {
     const matchesSearch = property.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||

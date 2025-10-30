@@ -13,14 +13,28 @@ export async function GET(request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Find user in Prisma database with retry
-    const prismaUser = await withRetry(async () => {
-      return await prisma.user.findUnique({
-        where: { email: user.email }
+    // Resolve Prisma userId with small in-memory cache by email to avoid extra DB hits
+    const userIdCacheKey = `uid:${user.email}`;
+    let prismaUserId = memoryCache.config.get(userIdCacheKey);
+    if (!prismaUserId) {
+      const prismaUser = await withRetry(async () => {
+        return await prisma.user.findUnique({
+          where: { email: user.email },
+          select: { id: true }
+        });
       });
-    });
+      if (!prismaUser) {
+        return NextResponse.json(
+          { error: 'User not found in database' },
+          { status: 404 }
+        );
+      }
+      prismaUserId = prismaUser.id;
+      // Cache userId for 5 minutes
+      memoryCache.config.set(userIdCacheKey, prismaUserId, 300);
+    }
 
-    if (!prismaUser) {
+    if (!prismaUserId) {
       return NextResponse.json(
         { error: 'User not found in database' },
         { status: 404 }
@@ -36,13 +50,13 @@ export async function GET(request) {
     const status = searchParams.get('status') || '';
 
     // Create cache key based on user ID and query parameters
-    const cacheKey = `property-list-${prismaUser.id}-${page}-${limit}-${search}-${propertyType}-${status}`;
+    const cacheKey = `property-list-${prismaUserId}-${page}-${limit}-${search}-${propertyType}-${status}`;
     
     // Check cache first
     const cachedResult = memoryCache.report.get(cacheKey);
     if (cachedResult) {
       console.log('✅ Cache HIT - Returning property list from memory cache:', {
-        userId: prismaUser.id,
+        userId: prismaUserId,
         page,
         limit,
         cacheKey: cacheKey.substring(0, 50) + '...'
@@ -58,14 +72,14 @@ export async function GET(request) {
     }
     
     console.log('❌ Cache MISS - Fetching property list from database:', {
-      userId: prismaUser.id,
+      userId: prismaUserId,
       page,
       limit
     });
 
     // Build where clause
     const where = {
-      userId: prismaUser.id
+      userId: prismaUserId
     };
 
     if (search) {
@@ -172,7 +186,7 @@ export async function GET(request) {
     memoryCache.report.set(cacheKey, result, 30);
     
     console.log('✅ Cached property list result:', {
-      userId: prismaUser.id,
+      userId: prismaUserId,
       page,
       totalResults: total,
       cacheTTL: 30
