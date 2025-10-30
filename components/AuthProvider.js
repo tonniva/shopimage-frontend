@@ -12,62 +12,58 @@ export default function AuthProvider({ children }) {
 
   useEffect(() => {
     let mounted = true;
-    
-    // Fast path: Check if we have session data in localStorage (optimistic loading)
-    // This allows the UI to render immediately while session loads in background
-    if (typeof window !== 'undefined') {
+
+    // แสดง UI ทันที ระหว่างที่กำลัง sync session
+    setReady(true);
+
+    // Helper: แปลง user จาก server endpoint → รูปแบบเหมือน Supabase client
+    const mapServerUser = (u) => {
+      if (!u) return null;
+      return {
+        id: u.id,
+        email: u.email,
+        user_metadata: {
+          full_name: u.name,
+          avatar_url: u.image,
+        },
+      };
+    };
+
+    const init = async () => {
       try {
-        // Supabase stores session in localStorage with this key pattern
-        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-        if (supabaseUrl) {
-          const projectRef = supabaseUrl.match(/https?:\/\/([^.]+)\.supabase\.co/)?.[1];
-          if (projectRef) {
-            const storedKey = `sb-${projectRef}-auth-token`;
-            const stored = localStorage.getItem(storedKey);
-            if (stored) {
-              // If we have stored session, set ready early to show UI
-              // Actual user data will be updated when getSession() completes
-              setReady(true);
-            }
-          }
-        }
-      } catch (e) {
-        // Ignore localStorage errors (e.g., in SSR or private browsing)
-      }
-    }
-    
-    // 1) อ่าน session ทันที (เร็วกว่า getUser ในหลายเคส)
-    supabase.auth.getSession().then(({ data }) => {
-      if (!mounted) return;
+        const [serverJson, clientData] = await Promise.all([
+          fetch('/api/auth/session', { credentials: 'include', cache: 'no-store' })
+            .then(r => (r.ok ? r.json() : null))
+            .catch(() => null),
+          supabase.auth.getSession().then(({ data }) => data).catch(() => null),
+        ]);
 
-      setUser(data?.session?.user ?? null);
-      debugger
-      setReady(true);
-      console.log("1", data);
-    }).catch((error) => {
-      console.error('Error getting session:', error);
-      // Set ready even on error to show UI (user might not be logged in)
-      if (mounted) {
-        setReady(true);
-      }
-    });
+        if (!mounted) return;
 
-    // 2) sync เมื่อ login/logout/refresh
+        const serverUser = serverJson?.user ? mapServerUser(serverJson.user) : null;
+        const clientUser = clientData?.session?.user ?? null;
+
+        // ให้สิทธิ์ clientUser ก่อน (สดกว่า) ถ้าไม่มีค่อยใช้ serverUser
+        setUser(clientUser || serverUser || null);
+      } catch {
+        if (mounted) setUser(null);
+      }
+    };
+
+    init();
+
+    // sync เมื่อ login/logout/refresh
     const { data: sub } = supabase.auth.onAuthStateChange((_evt, session) => {
       if (!mounted) return;
       setUser(session?.user ?? null);
-      // Set ready on auth state change if not already ready
       setReady(true);
-      console.log("2", session);
     });
 
-    // 3) กันเคส auto-refresh ที่มากับ visibilitychange
+    // กันเคส auto-refresh ที่มากับ visibilitychange
     const onVis = async () => {
       const { data } = await supabase.auth.getSession();
       if (!mounted) return;
       setUser(data?.session?.user ?? null);
-
-      console.log("3", data);
     };
     document.addEventListener("visibilitychange", onVis);
 
