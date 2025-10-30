@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createServerSupabase } from '@/utils/supabase/server';
 import { prisma, withRetry } from '@/lib/prisma';
+import { memoryCache } from '@/lib/cache';
 
 export async function GET(request) {
   try {
@@ -33,6 +34,34 @@ export async function GET(request) {
     const search = searchParams.get('search') || '';
     const propertyType = searchParams.get('propertyType') || '';
     const status = searchParams.get('status') || '';
+
+    // Create cache key based on user ID and query parameters
+    const cacheKey = `property-list-${prismaUser.id}-${page}-${limit}-${search}-${propertyType}-${status}`;
+    
+    // Check cache first
+    const cachedResult = memoryCache.report.get(cacheKey);
+    if (cachedResult) {
+      console.log('✅ Cache HIT - Returning property list from memory cache:', {
+        userId: prismaUser.id,
+        page,
+        limit,
+        cacheKey: cacheKey.substring(0, 50) + '...'
+      });
+      
+      return NextResponse.json(cachedResult, {
+        headers: {
+          'X-Cache': 'HIT',
+          'X-Cache-Source': 'memory',
+          'Cache-Control': 'private, max-age=30, stale-while-revalidate=60'
+        }
+      });
+    }
+    
+    console.log('❌ Cache MISS - Fetching property list from database:', {
+      userId: prismaUser.id,
+      page,
+      limit
+    });
 
     // Build where clause
     const where = {
@@ -126,7 +155,7 @@ export async function GET(request) {
       updatedAt: report.updatedAt
     }));
 
-    return NextResponse.json({
+    const result = {
       properties: transformedReports,
       pagination: {
         page,
@@ -135,6 +164,25 @@ export async function GET(request) {
         totalPages: Math.ceil(total / limit),
         hasNext: page < Math.ceil(total / limit),
         hasPrev: page > 1
+      }
+    };
+
+    // Cache the result for 30 seconds (TTL)
+    // User-specific data should have shorter cache time
+    memoryCache.report.set(cacheKey, result, 30);
+    
+    console.log('✅ Cached property list result:', {
+      userId: prismaUser.id,
+      page,
+      totalResults: total,
+      cacheTTL: 30
+    });
+
+    return NextResponse.json(result, {
+      headers: {
+        'X-Cache': 'MISS',
+        'X-Cache-Source': 'database',
+        'Cache-Control': 'private, max-age=30, stale-while-revalidate=60'
       }
     });
 
