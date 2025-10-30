@@ -40,6 +40,7 @@ export default function AuthProvider({ children }) {
     supabase.auth.getSession().then(({ data }) => {
       if (!mounted) return;
       setUser(data?.session?.user ?? null);
+      debugger
       setReady(true);
     }).catch((error) => {
       console.error('Error getting session:', error);
