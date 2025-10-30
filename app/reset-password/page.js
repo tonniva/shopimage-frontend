@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
@@ -10,16 +10,6 @@ export default function ResetPasswordPage() {
   const [pass, setPass] = useState("");
   const [confirm, setConfirm] = useState("");
   const [working, setWorking] = useState(false);
-  const [ready, setReady] = useState(false);
-
-  // รอให้ supabase ตั้ง session จาก hash เสร็จก่อน (ครั้งแรกที่โหลดหน้านี้)
-  useEffect(() => {
-    // หน้านี้ถูกเปิดมาจากลิงก์ในอีเมล (มี access_token ใน hash)
-    // Supabase client จะอ่าน hash และ setSession อัตโนมัติ
-    // หน่วงสั้น ๆ ให้แน่ใจว่า session เข้าที่
-    const t = setTimeout(() => setReady(true), 300);
-    return () => clearTimeout(t);
-  }, []);
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -38,14 +28,6 @@ export default function ResetPasswordPage() {
       setWorking(false);
     }
   };
-
-  if (!ready) {
-    return (
-      <main className="min-h-screen flex items-center justify-center p-6 bg-gray-50">
-        <div className="border border-black bg-white rounded-xl px-5 py-4">กำลังเตรียมหน้า…</div>
-      </main>
-    );
-  }
 
   return (
     <main className="min-h-screen flex items-center justify-center p-6 bg-gray-50">
