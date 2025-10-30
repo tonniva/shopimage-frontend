@@ -31,23 +31,24 @@ export default function AuthProvider({ children }) {
 
     const init = async () => {
       try {
-        const [serverJson, clientData] = await Promise.all([
-          fetch('/api/auth/session', { credentials: 'include', cache: 'no-store' })
-            .then(r => (r.ok ? r.json() : null))
-            .catch(() => null),
-          supabase.auth.getSession().then(({ data }) => data).catch(() => null),
-        ]);
+        // 1) ยิงหา server session ก่อน แล้ว set ทันทีที่เจอ (ไม่รอ client)
+        fetch('/api/auth/session', { credentials: 'include', cache: 'no-store' })
+          .then(r => (r.ok ? r.json() : null))
+          .then((serverJson) => {
+            if (!mounted || !serverJson?.user) return;
+            const serverUser = mapServerUser(serverJson.user);
+            setUser((prev) => prev ?? serverUser);
+          })
+          .catch(() => {});
 
-        if (!mounted) return;
-
-        const serverUser = serverJson?.user ? mapServerUser(serverJson.user) : null;
-        const clientUser = clientData?.session?.user ?? null;
-
-        // ให้สิทธิ์ clientUser ก่อน (สดกว่า) ถ้าไม่มีค่อยใช้ serverUser
-        setUser(clientUser || serverUser || null); 
-        console.log("clientUser : ",clientUser );
-        console.log("serverUser : ",serverUser );
-        debugger
+        // 2) ดึง client session ต่อ (อาจช้ากว่า) เพื่ออัปเดตความสดใหม่
+        supabase.auth.getSession()
+          .then(({ data }) => {
+            if (!mounted) return;
+            const clientUser = data?.session?.user ?? null;
+            if (clientUser) setUser(clientUser);
+          })
+          .catch(() => {});
       } catch {
         if (mounted) setUser(null);
       }

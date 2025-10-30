@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { createServerSupabase } from '@/utils/supabase/server';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 /**
  * GET /api/auth/session
  * Returns the current Supabase session for the authenticated user
@@ -15,12 +18,12 @@ export async function GET(request) {
     
     if (error) {
       console.error('Error getting Supabase session:', error);
-      return NextResponse.json({}, { status: 200 });
+      return NextResponse.json({}, { status: 200, headers: { 'Cache-Control': 'no-store, max-age=0' } });
     }
     
     // If no session, return empty object (same as NextAuth behavior)
     if (!session || !session.user) {
-      return NextResponse.json({});
+      return NextResponse.json({}, { headers: { 'Cache-Control': 'no-store, max-age=0' } });
     }
     
     // Transform Supabase session to NextAuth-like format
@@ -32,12 +35,12 @@ export async function GET(request) {
         image: session.user.user_metadata?.avatar_url || session.user.user_metadata?.picture || null,
       },
       expires: session.expires_at ? new Date(session.expires_at * 1000).toISOString() : null,
-    });
+    }, { headers: { 'Cache-Control': 'no-store, max-age=0' } });
     
   } catch (error) {
     console.error('Error in /api/auth/session:', error);
     // Return empty object on error (same as NextAuth behavior)
-    return NextResponse.json({}, { status: 200 });
+    return NextResponse.json({}, { status: 200, headers: { 'Cache-Control': 'no-store, max-age=0' } });
   }
 }
 
