@@ -55,8 +55,7 @@ export function AuthHeader() {
 
   // Show loading state while auth is not ready
   console.log("AuthHeader render:", { ready, user });
-  if (!ready && !user) {
-    debugger
+  if (!ready && !user) { 
     return (
       <>
         {/* Auth + Lang */}

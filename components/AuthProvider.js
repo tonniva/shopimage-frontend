@@ -39,9 +39,11 @@ export default function AuthProvider({ children }) {
     // 1) อ่าน session ทันที (เร็วกว่า getUser ในหลายเคส)
     supabase.auth.getSession().then(({ data }) => {
       if (!mounted) return;
+
       setUser(data?.session?.user ?? null);
       debugger
       setReady(true);
+      console.log("1", data?.session?.user);
     }).catch((error) => {
       console.error('Error getting session:', error);
       // Set ready even on error to show UI (user might not be logged in)
@@ -56,6 +58,7 @@ export default function AuthProvider({ children }) {
       setUser(session?.user ?? null);
       // Set ready on auth state change if not already ready
       setReady(true);
+      console.log("2", session?.user);
     });
 
     // 3) กันเคส auto-refresh ที่มากับ visibilitychange
@@ -63,6 +66,8 @@ export default function AuthProvider({ children }) {
       const { data } = await supabase.auth.getSession();
       if (!mounted) return;
       setUser(data?.session?.user ?? null);
+
+      console.log("3", data?.session?.user);
     };
     document.addEventListener("visibilitychange", onVis);
 
