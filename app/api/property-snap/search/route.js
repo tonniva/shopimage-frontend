@@ -2,6 +2,11 @@ import { NextResponse } from 'next/server';
 import { prisma, withRetry } from '@/lib/prisma';
 import { getCategoryThai, getProvinceThai, getCategoryInfo } from '@/lib/property-mappings';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const runtime = 'nodejs';
+export const maxDuration = 30;
+
 // Public search API - no auth required
 export async function GET(request) {
   try {

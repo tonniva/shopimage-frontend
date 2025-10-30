@@ -2,7 +2,10 @@ import { NextResponse } from 'next/server';
 import { createServerSupabase } from '@/utils/supabase/server';
 import { prisma, withRetry } from '@/lib/prisma';
 import { memoryCache } from '@/lib/cache';
-
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+export const runtime = 'nodejs';
+export const maxDuration = 30;
 export async function GET(request) {
   try {
     // Check Authentication
