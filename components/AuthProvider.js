@@ -43,7 +43,7 @@ export default function AuthProvider({ children }) {
       setUser(data?.session?.user ?? null);
       debugger
       setReady(true);
-      console.log("1", data?.session?.user);
+      console.log("1", data);
     }).catch((error) => {
       console.error('Error getting session:', error);
       // Set ready even on error to show UI (user might not be logged in)
@@ -58,7 +58,7 @@ export default function AuthProvider({ children }) {
       setUser(session?.user ?? null);
       // Set ready on auth state change if not already ready
       setReady(true);
-      console.log("2", session?.user);
+      console.log("2", session);
     });
 
     // 3) กันเคส auto-refresh ที่มากับ visibilitychange
@@ -67,7 +67,7 @@ export default function AuthProvider({ children }) {
       if (!mounted) return;
       setUser(data?.session?.user ?? null);
 
-      console.log("3", data?.session?.user);
+      console.log("3", data);
     };
     document.addEventListener("visibilitychange", onVis);
 

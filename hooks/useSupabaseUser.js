@@ -34,6 +34,7 @@ export function useSupabaseUser() {
           setUser(sessData.session.user);
  
         setChecking(false);
+        console.log("5",session)
       } else {
         // 2) ถ้าไม่มีทันที → รอ getUser() แบบ retry ภายใน 2s
         const u = await waitForUser(1000, 150);
@@ -41,6 +42,7 @@ export function useSupabaseUser() {
             setUser(u);
       
           setChecking(false);
+          console.log("6",session)
         }
       }
 
@@ -48,6 +50,7 @@ export function useSupabaseUser() {
       const { data: sub } = supabase.auth.onAuthStateChange((_evt, session) => {
         if (!mounted) return;
         setUser(session?.user ?? null); 
+        console.log("7",session)
       });
       unsub = sub?.subscription;
     })();
