@@ -44,7 +44,10 @@ export default function AuthProvider({ children }) {
         const clientUser = clientData?.session?.user ?? null;
 
         // ให้สิทธิ์ clientUser ก่อน (สดกว่า) ถ้าไม่มีค่อยใช้ serverUser
-        setUser(clientUser || serverUser || null);
+        setUser(clientUser || serverUser || null); 
+        console.log("clientUser : ",clientUser );
+        console.log("serverUser : ",serverUser );
+        debugger
       } catch {
         if (mounted) setUser(null);
       }
@@ -57,6 +60,7 @@ export default function AuthProvider({ children }) {
       if (!mounted) return;
       setUser(session?.user ?? null);
       setReady(true);
+      console.log("session : ",session );
     });
 
     // กันเคส auto-refresh ที่มากับ visibilitychange
