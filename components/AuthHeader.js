@@ -54,7 +54,7 @@ export function AuthHeader() {
   };
 
   // Show loading state while auth is not ready
-  if (!ready) {
+  if (!ready && !user) {
     return (
       <>
         {/* Auth + Lang */}
