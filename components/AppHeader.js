@@ -20,7 +20,7 @@ export default function AppHeader() {
   const mobileMenuItems = [
     { href: "/", icon: ImageIcon, label: "IMG to WEBP", color: "blue" },
     { href: "/pdf-converter", icon: FileText, label: "PDF to JPG", color: "red" },
-    { href: "/property-snap", icon: Home, label: "Property Snap", color: "indigo" },
+    // { href: "/property-snap", icon: Home, label: "Property Snap", color: "indigo" },
     { href: "/add-qr-to-image", icon: QrCode, label: "Add QR Code", color: "purple" },
     { href: "/add-logo-to-image", icon: ImageIconLucide, label: "Add Logo", color: "green" },
     { href: "/gif-maker", icon: Film, label: "GIF Maker", color: "orange" },
@@ -313,13 +313,13 @@ export default function AppHeader() {
                 <span>PDF</span>
               </Link>
 
-              <Link
+              {/* <Link
                 href="/property-snap"
                 className="flex items-center gap-1 px-2 py-1.5 rounded text-xs font-bold border border-black bg-gradient-to-br from-indigo-50 to-indigo-100 hover:from-indigo-100 hover:to-indigo-200 hover:-translate-y-0.5 hover:shadow-[2px_2px_0_#000] active:translate-y-0 active:shadow-[1px_1px_0_#000] transition-all duration-150"
               >
                 <Home size={14} className="text-indigo-600" />
                 <span>Property</span>
-              </Link>
+              </Link> */}
 
               <Link
                 href="/add-qr-to-image"
