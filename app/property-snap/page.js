@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/components/AuthProvider';
 import Swal from 'sweetalert2';
+import propertySnapAPI from '@/lib/property-snap-api';
 import { 
   MapPin, 
   Camera, 
@@ -55,24 +56,32 @@ export default function PropertySnapMainPage() {
     (async () => {
       try {
         setLoading(true);
-        const params = new URLSearchParams({
-          page: '1',
-          limit: '20',
+        const data = await propertySnapAPI.list({
+          page: 1,
+          limit: 20,
           search: searchTerm || '',
           propertyType: selectedType || 'all',
           status: 'all'
         });
-        const response = await fetch(`/api/property-snap/list?${params}`, {
-          signal: ac.signal,
-          cache: 'no-store'
-        });
-        if (response.ok) {
-          const data = await response.json();
-          setProperties(data.properties || []);
-        }
+        setProperties(data.properties || []);
       } catch (error) {
         if (error.name !== 'AbortError') {
-          console.error('Error fetching properties:', error);
+          console.error('❌ Error fetching properties:', error);
+          console.error('Error details:', {
+            message: error.message,
+            status: error.status,
+            data: error.data
+          });
+          
+          // Show user-friendly error message
+          if (error.message && !error.message.includes('AbortError')) {
+            Swal.fire({
+              icon: 'error',
+              title: 'ไม่สามารถโหลดข้อมูลได้',
+              text: error.message || 'เกิดข้อผิดพลาด กรุณาลองอีกครั้ง',
+              confirmButtonText: 'ตกลง'
+            });
+          }
         }
       } finally {
         setLoading(false);
@@ -85,24 +94,15 @@ export default function PropertySnapMainPage() {
   // Handle status change
   const handleStatusChange = async (propertyId, newStatus) => {
     try {
-      const response = await fetch(`/api/property-snap/${propertyId}/status`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ status: newStatus }),
-      });
-
-      if (response.ok) {
-        // Update local state
-        setProperties(prev => 
-          prev.map(prop => 
-            prop.id === propertyId 
-              ? { ...prop, status: newStatus }
-              : prop
-          )
-        );
-      }
+      await propertySnapAPI.updateStatus(propertyId, newStatus);
+      // Update local state
+      setProperties(prev => 
+        prev.map(prop => 
+          prop.id === propertyId 
+            ? { ...prop, status: newStatus }
+            : prop
+        )
+      );
     } catch (error) {
       console.error('Error updating status:', error);
     }
@@ -129,35 +129,23 @@ export default function PropertySnapMainPage() {
     if (!result.isConfirmed) return;
 
     try {
-      const response = await fetch(`/api/property-snap/${propertyId}`, {
-        method: 'DELETE',
+      await propertySnapAPI.delete(propertyId);
+      // Remove from local state
+      setProperties(prev => prev.filter(prop => prop.id !== propertyId));
+      
+      await Swal.fire({
+        icon: 'success',
+        title: 'ลบสำเร็จ',
+        text: 'รายงานถูกลบเรียบร้อยแล้ว',
+        timer: 2000,
+        showConfirmButton: false
       });
-
-      if (response.ok) {
-        // Remove from local state
-        setProperties(prev => prev.filter(prop => prop.id !== propertyId));
-        
-        await Swal.fire({
-          icon: 'success',
-          title: 'ลบสำเร็จ',
-          text: 'รายงานถูกลบเรียบร้อยแล้ว',
-          timer: 2000,
-          showConfirmButton: false
-        });
-      } else {
-        const data = await response.json();
-        await Swal.fire({
-          icon: 'error',
-          title: 'ลบไม่สำเร็จ',
-          text: data.error || 'เกิดข้อผิดพลาดในการลบรายงาน'
-        });
-      }
     } catch (error) {
       console.error('Error deleting property:', error);
       await Swal.fire({
         icon: 'error',
         title: 'เกิดข้อผิดพลาด',
-        text: 'ไม่สามารถลบรายงานได้ กรุณาลองอีกครั้ง'
+        text: error.message || 'ไม่สามารถลบรายงานได้ กรุณาลองอีกครั้ง'
       });
     }
   };

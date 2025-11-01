@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import { Upload, X, Image as ImageIcon, Settings, Save, Trash2, ArrowUp, ArrowDown } from 'lucide-react';
+import propertySnapAPI from '@/lib/property-snap-api';
 
 export default function PropertySnapHeaderManager() {
   const [headers, setHeaders] = useState([]);
@@ -18,16 +19,13 @@ export default function PropertySnapHeaderManager() {
   const fetchHeaders = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/property-snap/header');
-      if (response.ok) {
-        const data = await response.json();
-        setHeaders(data.headers || []);
-        
-        // Load settings from first header if available
-        if (data.headers && data.headers.length > 0) {
-          setAutoSlide(data.headers[0].autoSlide);
-          setSlideDelay(data.headers[0].slideDelay / 1000); // Convert to seconds
-        }
+      const data = await propertySnapAPI.headers.list();
+      setHeaders(data.headers || []);
+      
+      // Load settings from first header if available
+      if (data.headers && data.headers.length > 0) {
+        setAutoSlide(data.headers[0].autoSlide);
+        setSlideDelay(data.headers[0].slideDelay / 1000); // Convert to seconds
       }
     } catch (error) {
       console.error('Error fetching headers:', error);
@@ -50,21 +48,7 @@ export default function PropertySnapHeaderManager() {
     formData.append('slideDelay', slideDelay * 1000); // Convert to milliseconds
 
     try {
-      const response = await fetch('/api/property-snap/header/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
-      console.log('📡 Response status:', response.status);
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('❌ Response not ok:', response.status, errorText);
-        alert(`เกิดข้อผิดพลาด: ${response.status} ${response.statusText}`);
-        return;
-      }
-
-      const data = await response.json();
+      const data = await propertySnapAPI.headers.upload(formData);
       
       console.log('📥 Upload response:', data);
       console.log('📊 Results breakdown:', {
@@ -126,16 +110,9 @@ export default function PropertySnapHeaderManager() {
     if (!confirm('คุณแน่ใจหรือไม่ที่จะลบรูปนี้?')) return;
 
     try {
-      const response = await fetch(`/api/property-snap/header/${id}`, {
-        method: 'DELETE',
-      });
-
-      if (response.ok) {
-        await fetchHeaders();
-        alert('ลบสำเร็จ');
-      } else {
-        alert('เกิดข้อผิดพลาดในการลบ');
-      }
+      await propertySnapAPI.headers.delete(id);
+      await fetchHeaders();
+      alert('ลบสำเร็จ');
     } catch (error) {
       console.error('Error deleting:', error);
       alert('เกิดข้อผิดพลาดในการลบ');
@@ -155,16 +132,8 @@ export default function PropertySnapHeaderManager() {
     try {
       // Swap orders
       await Promise.all([
-        fetch(`/api/property-snap/header/${id}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ order: newOrder })
-        }),
-        otherHeader && fetch(`/api/property-snap/header/${otherHeader.id}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ order: currentHeader.order })
-        })
+        propertySnapAPI.headers.update(id, { order: newOrder }),
+        otherHeader && propertySnapAPI.headers.update(otherHeader.id, { order: currentHeader.order })
       ]);
 
       await fetchHeaders();
@@ -177,13 +146,9 @@ export default function PropertySnapHeaderManager() {
   const handleSaveSettings = async () => {
     try {
       const updatePromises = headers.map(header => 
-        fetch(`/api/property-snap/header/${header.id}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            autoSlide,
-            slideDelay: slideDelay * 1000
-          })
+        propertySnapAPI.headers.update(header.id, {
+          autoSlide,
+          slideDelay: slideDelay * 1000
         })
       );
 

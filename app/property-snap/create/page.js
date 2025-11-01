@@ -2,6 +2,7 @@
 import { useState, useRef } from 'react';
 import { useAuth } from '@/components/AuthProvider';
 import { useRouter } from 'next/navigation';
+import propertySnapAPI from '@/lib/property-snap-api';
 import {
   DndContext,
   closestCenter,
@@ -549,56 +550,15 @@ export default function CreatePropertySnapPage() {
         });
       }, 200);
 
-      const response = await fetch('/api/property-snap/create', {
-        method: 'POST',
-        body: formDataToSend
-      });
-
-      console.log('API Response Status:', response.status);
-      console.log('API Response Headers:', Object.fromEntries(response.headers.entries()));
-
       clearInterval(progressInterval);
       setUploadProgress(100);
 
-      if (response.ok) {
-        const result = await response.json();
-        
-        // Track successful report creation
-        trackPropertySnap.create(result.reportId, images.length, nearbyPlaces.length);
-        
-        router.push(`/property-snap/success/${result.shareToken}`);
-      } else {
-        console.log('API Response not OK, status:', response.status);
-        console.log('API Response statusText:', response.statusText);
-        
-        let errorData;
-        const contentType = response.headers.get('content-type');
-        
-        try {
-          if (contentType && contentType.includes('application/json')) {
-            const text = await response.text();
-            errorData = text ? JSON.parse(text) : {};
-          } else {
-            const text = await response.text();
-            errorData = text ? { error: text, details: text } : { error: 'Unknown error' };
-          }
-          console.log('API Error Data:', errorData);
-        } catch (parseError) {
-          console.error('Failed to parse error response:', parseError);
-          errorData = { 
-            error: `HTTP ${response.status}: ${response.statusText}`, 
-            details: 'Failed to parse error response' 
-          };
-        }
-        
-        console.error('API Error:', errorData);
-        
-        // Show more detailed error message
-        const errorMessage = errorData.details || errorData.error || 'Unknown error';
-        const errorType = errorData.type || 'Error';
-        
-        throw new Error(`${errorType}: ${errorMessage}`);
-      }
+      const result = await propertySnapAPI.create(formDataToSend);
+      
+      // Track successful report creation
+      trackPropertySnap.create(result.reportId, images.length, nearbyPlaces.length);
+      
+      router.push(`/property-snap/success/${result.shareToken}`);
     } catch (error) {
       console.error('Error creating report:', error);
       

@@ -35,6 +35,7 @@ import {
 } from 'lucide-react';
 import { trackPropertySnap, trackEvent, EVENTS, CATEGORIES } from '@/lib/analytics';
 import ImagePreviewModal from '@/components/ImagePreviewModal';
+import propertySnapAPI from '@/lib/property-snap-api';
 
 export default function SharedPropertyReportPage() {
   const params = useParams();
@@ -56,18 +57,7 @@ export default function SharedPropertyReportPage() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/property-snap/share/${shareToken}`);
-
-      if (!response.ok) {
-        if (response.status === 404) {
-          setError('รายงานไม่พบหรือไม่สามารถเข้าถึงได้');
-        } else {
-          setError('เกิดข้อผิดพลาดในการโหลดรายงาน');
-        }
-        return;
-      }
-
-      const data = await response.json();
+      const data = await propertySnapAPI.getByShareToken(shareToken);
       setReport(data.report || data);
     } catch (err) {
       console.error('Error fetching report:', err);

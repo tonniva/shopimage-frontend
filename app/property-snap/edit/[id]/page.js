@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/components/AuthProvider';
 import { useRouter, useParams } from 'next/navigation';
+import propertySnapAPI from '@/lib/property-snap-api';
 import {
   DndContext,
   closestCenter,
@@ -507,49 +508,15 @@ export default function EditPropertySnapPage() {
         }
       });
 
-      const response = await fetch(`/api/property-snap/${id}`, {
-        method: 'PUT',
-        body: formDataToSend,
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        setSuccess(true);
-        
-        // Track successful update
-        trackPropertySnap.update(id, images.length, nearbyPlaces.length);
-        
-        setTimeout(() => {
-          router.push(`/share/${result.shareToken}`);
-        }, 2000);
-      } else {
-        // Try to parse error response, but handle empty/invalid response
-        let errorData;
-        const contentType = response.headers.get('content-type');
-        
-        try {
-          if (contentType && contentType.includes('application/json')) {
-            const text = await response.text();
-            errorData = text ? JSON.parse(text) : {};
-          } else {
-            const text = await response.text();
-            errorData = text ? { error: text, details: text } : { error: 'Unknown error' };
-          }
-        } catch (parseError) {
-          console.error('Failed to parse error response:', parseError);
-          errorData = { 
-            error: `HTTP ${response.status}: ${response.statusText}`, 
-            details: 'Failed to parse error response' 
-          };
-        }
-        
-        console.error('API Error:', errorData);
-        
-        const errorMessage = errorData.details || errorData.error || `HTTP ${response.status} error`;
-        const errorType = errorData.type || 'Error';
-        
-        throw new Error(`${errorType}: ${errorMessage}`);
-      }
+      const result = await propertySnapAPI.update(id, formDataToSend);
+      setSuccess(true);
+      
+      // Track successful update
+      trackPropertySnap.update(id, images.length, nearbyPlaces.length);
+      
+      setTimeout(() => {
+        router.push(`/share/${result.shareToken}`);
+      }, 2000);
     } catch (error) {
       console.error('Error updating report:', error);
       

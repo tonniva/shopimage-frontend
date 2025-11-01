@@ -1,5 +1,6 @@
 // hooks/useImageProcessing.js
 import { useState, useCallback } from 'react';
+import propertySnapAPI from '@/lib/property-snap-api';
 
 export function useImageProcessing() {
   const [processing, setProcessing] = useState(false);
@@ -27,17 +28,7 @@ export function useImageProcessing() {
       // Add processing options
       formData.append('options', JSON.stringify(options));
 
-      const response = await fetch('/api/property-snap/process-images', {
-        method: 'POST',
-        body: formData
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to process images');
-      }
-
-      const data = await response.json();
+      const data = await propertySnapAPI.processImages(formData);
       setProgress(100);
       
       return { success: true, data };
@@ -53,14 +44,7 @@ export function useImageProcessing() {
 
   const getImageMetadata = useCallback(async (imageUrl) => {
     try {
-      const response = await fetch(`/api/property-snap/process-images?url=${encodeURIComponent(imageUrl)}`);
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to get image metadata');
-      }
-
-      const data = await response.json();
+      const data = await propertySnapAPI.getImageMetadata(imageUrl);
       return { success: true, metadata: data.metadata };
 
     } catch (err) {
